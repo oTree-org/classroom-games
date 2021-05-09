@@ -1,0 +1,44 @@
+{{ block title }}
+{{ endblock }}
+
+{{ block content }}
+
+<p id="question"></p>
+
+<div>
+    <button type="button" onclick="sendClick(this)" value="A" id="optionA">
+    </button>
+    <button type="button" onclick="sendClick(this)" value="B" id="optionB">
+    </button>
+    <button type="button" onclick="sendClick(this)" value="C" id="optionC">
+    </button>
+</div>
+
+<script>
+
+    let trialId = null;
+
+    function liveRecv(data) {
+        if (data.status === 'finished') {
+            document.getElementById('form').submit();
+        } else {
+            let stimulus = data.stimulus;
+            trialId = stimulus.id;
+
+            for (let item of ['question', 'optionA', 'optionB', 'optionC']) {
+                document.getElementById(item).innerText = stimulus[item];
+            }
+        }
+    }
+
+    function sendClick(btn) {
+        liveSend({'choice': btn.value, 'trialId': trialId});
+    }
+
+    document.addEventListener("DOMContentLoaded", function (event) {
+        // send empty message to load initial question, or in case page is refreshed.
+        liveSend({});
+    });
+</script>
+
+{{ endblock }}

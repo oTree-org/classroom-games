@@ -1,0 +1,14 @@
+{{ block title }}
+   Round {{ subsession.round_number }}, Shoot!
+{{ endblock }}
+{{ block content }}
+
+    {{ for choice in Constants.choices }}
+        <button name="hand" value="{{choice}}">{{choice}}</button>
+    {{ endfor }}
+
+    {{ if subsession.round_number > 1}}
+        {{ include Constants.history_template }}
+    {{ endif }}
+
+{{ endblock }}
