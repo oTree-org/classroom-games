@@ -1,4 +1,5 @@
 from otree.api import *
+from shared_out import *
 import time
 import random
 
@@ -19,6 +20,7 @@ class Subsession(BaseSubsession):
 
 
 def creating_session(subsession: Subsession):
+    set_players_per_group(subsession)
     players = subsession.get_players()
     for p in players:
         # for more buyers, change the 2 to 3

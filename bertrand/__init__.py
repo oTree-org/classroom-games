@@ -1,5 +1,6 @@
 from otree.api import *
-c = Currency  # old name for currency; you can delete this.
+from shared_out import *
+
 
 
 doc = """
@@ -51,6 +52,7 @@ def set_payoffs(group: Group):
         else:
             p.is_winner = False
             p.payoff = cu(0)
+
 
 
 # PAGES

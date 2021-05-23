@@ -1,6 +1,6 @@
 from otree.api import *
+from shared_out import *
 
-c = Currency  # old name for currency; you can delete this.
 
 doc = """
 a.k.a. Keynesian beauty contest.
@@ -21,6 +21,9 @@ class Constants(BaseConstants):
 
 class Subsession(BaseSubsession):
     pass
+
+def creating_session(subsession: Subsession):
+    set_players_per_group(subsession)
 
 
 class Group(BaseGroup):
@@ -54,7 +57,6 @@ def two_thirds_avg_history(group: Group):
     return [g.two_thirds_avg for g in group.in_previous_rounds()]
 
 
-# PAGES
 class Introduction(Page):
     @staticmethod
     def is_displayed(player: Player):
@@ -65,6 +67,7 @@ class Guess(Page):
     form_model = 'player'
     form_fields = ['guess']
 
+    @staticmethod
     def vars_for_template(player: Player):
         group = player.group
 

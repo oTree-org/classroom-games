@@ -1,4 +1,5 @@
 from otree.api import *
+from shared_out import *
 
 c = Currency
 
@@ -17,6 +18,10 @@ class Constants(BaseConstants):
 
 class Subsession(BaseSubsession):
     pass
+
+
+def creating_session(subsession: Subsession):
+    set_players_per_group(subsession)
 
 
 class Group(BaseGroup):

@@ -1,5 +1,5 @@
 from otree.api import *
-c = Currency  # old name for currency; you can delete this.
+from shared_out import *
 
 
 doc = """
@@ -12,10 +12,9 @@ Resolution, 605-610.
 
 class Constants(BaseConstants):
     name_in_url = 'volunteer_dilemma'
-    players_per_group = 3
+    players_per_group = None
     num_rounds = 1
     instructions_template = 'volunteer_dilemma/instructions.html'
-    num_other_players = players_per_group - 1
     # """Payoff for each player if at least one volunteers"""
     general_benefit = cu(100)
     # """Cost incurred by volunteering player"""
@@ -24,6 +23,10 @@ class Constants(BaseConstants):
 
 class Subsession(BaseSubsession):
     pass
+
+
+def creating_session(subsession: Subsession):
+    set_players_per_group(subsession)
 
 
 class Group(BaseGroup):

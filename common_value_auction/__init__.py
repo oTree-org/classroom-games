@@ -1,5 +1,6 @@
 from otree.api import *
-c = Currency  # old name for currency; you can delete this.
+from shared_out import *
+
 
 
 doc = """
@@ -25,6 +26,9 @@ class Constants(BaseConstants):
 
 class Subsession(BaseSubsession):
     pass
+
+def creating_session(subsession: Subsession):
+    set_players_per_group(subsession)
 
 
 class Group(BaseGroup):
@@ -97,6 +101,7 @@ def set_payoff(player: Player):
             player.payoff = 0
     else:
         player.payoff = 0
+
 
 
 # PAGES

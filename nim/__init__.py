@@ -1,4 +1,5 @@
 from otree.api import *
+from shared_out import *
 
 doc = """
 Game of Nim. Players take turns adding a number. First to 15 wins.

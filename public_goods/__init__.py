@@ -1,5 +1,6 @@
 from otree.api import *
-c = Currency  # old name for currency; you can delete this.
+from shared_out import *
+from shared_out import set_players_per_group
 
 
 doc = """
@@ -9,35 +10,24 @@ This is a one-period public goods game with 3 players.
 
 class Constants(BaseConstants):
     name_in_url = 'public_goods'
-    players_per_group = 3
+    players_per_group = None
     num_rounds = 1
     instructions_template = 'public_goods/instructions.html'
     # """Amount allocated to each player"""
-    endowment = cu(100)
-    multiplier = 2
 
 
 class Subsession(BaseSubsession):
     pass
 
 
-class Group(BaseGroup):
-    total_contribution = models.CurrencyField()
-    individual_share = models.CurrencyField()
+def creating_session(subsession: Subsession):
+    set_players_per_group(subsession)
 
 
-class Player(BasePlayer):
-    contribution = models.CurrencyField(
-        min=0,
-        max=Constants.endowment,
-        doc="""The amount contributed by the player""",
-        label="How much will you contribute to the project (from 0 to 100)?",
-    )
-
-
-# FUNCTIONS
 def vars_for_admin_report(subsession: Subsession):
-    contributions = [p.contribution for p in subsession.get_players() if p.contribution != None]
+    contributions = [
+        p.contribution for p in subsession.get_players() if p.contribution != None
+    ]
     if contributions:
         return dict(
             avg_contribution=sum(contributions) / len(contributions),
@@ -52,24 +42,43 @@ def vars_for_admin_report(subsession: Subsession):
         )
 
 
+class Group(BaseGroup):
+    total_contribution = models.CurrencyField()
+    individual_share = models.CurrencyField()
+
+
+class Player(BasePlayer):
+    contribution = models.CurrencyField(
+        min=0,
+        doc="""The amount contributed by the player""",
+        label="How much will you contribute to the project (from 0 to 100)?",
+    )
+
+
+def contribution_max(player: Player):
+    session = player.session
+    config = session.config
+
+    return config['endowment']
+
+
 def set_payoffs(group: Group):
+    session = group.session
+    config = session.config
+
     group.total_contribution = sum([p.contribution for p in group.get_players()])
     group.individual_share = (
-        group.total_contribution * Constants.multiplier / Constants.players_per_group
+        group.total_contribution * config['multiplier'] / config['players_per_group']
     )
     for p in group.get_players():
-        p.payoff = (Constants.endowment - p.contribution) + group.individual_share
+        p.payoff = (config['endowment'] - p.contribution) + group.individual_share
 
 
-# PAGES
 class Introduction(Page):
-    """Description of the game: How to play and returns expected"""
-
     pass
 
 
 class Contribute(Page):
-    """Player: Choose how much to contribute"""
 
     form_model = 'player'
     form_fields = ['contribution']
@@ -81,13 +90,14 @@ class ResultsWaitPage(WaitPage):
 
 
 class Results(Page):
-    """Players payoff: How much each has earned"""
-
     @staticmethod
     def vars_for_template(player: Player):
         group = player.group
+        session = group.session
 
-        return dict(total_earnings=group.total_contribution * Constants.multiplier)
+        return dict(
+            total_earnings=group.total_contribution * session.config['multiplier']
+        )
 
 
 page_sequence = [Introduction, Contribute, ResultsWaitPage, Results]
