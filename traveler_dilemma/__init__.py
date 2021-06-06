@@ -1,7 +1,4 @@
 from otree.api import *
-from shared_out import *
-
-
 
 doc = """
 Kaushik Basu's famous traveler's dilemma (

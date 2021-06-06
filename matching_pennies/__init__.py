@@ -1,7 +1,4 @@
 from otree.api import *
-from shared_out import *
-
-
 
 doc = """
 A demo of how rounds work in oTree, in the context of 'matching pennies'

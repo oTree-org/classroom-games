@@ -1,5 +1,5 @@
 from otree.api import *
-from shared_out import *
+from shared_out import set_players_per_group
 
 
 doc = """

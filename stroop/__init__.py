@@ -1,6 +1,4 @@
-from pathlib import Path
 from otree.api import *
-from shared_out import *
 
 doc = """Stroop test."""
 

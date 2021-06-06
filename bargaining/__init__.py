@@ -1,6 +1,4 @@
 from otree.api import *
-from shared_out import *
-
 
 doc = """
 This bargaining game involves 2 players. Each demands for a portion of some

@@ -1,7 +1,6 @@
 from otree.api import *
-from shared_out import *
-from shared_out import set_players_per_group
 
+from shared_out import set_players_per_group, get_or_none
 
 doc = """
 This is a one-period public goods game with 3 players.
@@ -26,7 +25,9 @@ def creating_session(subsession: Subsession):
 
 def vars_for_admin_report(subsession: Subsession):
     contributions = [
-        p.contribution for p in subsession.get_players() if p.contribution != None
+        p.contribution
+        for p in subsession.get_players()
+        if get_or_none(p, 'contribution') != None
     ]
     if contributions:
         return dict(

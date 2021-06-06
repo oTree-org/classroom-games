@@ -1,5 +1,4 @@
 from otree.api import *
-from shared_out import *
 
 doc = """
 Monty Hall problem

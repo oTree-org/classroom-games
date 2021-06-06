@@ -1,8 +1,4 @@
 from otree.api import *
-from shared_out import *
-
-
-
 
 doc = """
 This is a one-shot "Prisoner's Dilemma". Two players are asked separately

@@ -1,7 +1,4 @@
 from otree.api import *
-from shared_out import *
-
-
 
 doc = """
 One player decides how to divide a certain amount between himself and the other

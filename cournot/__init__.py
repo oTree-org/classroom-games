@@ -1,7 +1,4 @@
 from otree.api import *
-from shared_out import *
-
-
 
 doc = """
 In Cournot competition, firms simultaneously decide the units of products to

@@ -1,8 +1,4 @@
 from otree.api import *
-from shared_out import *
-
-
-
 
 doc = """
 This is a standard 2-player trust game where the amount sent by player 1 gets

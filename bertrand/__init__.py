@@ -1,7 +1,4 @@
 from otree.api import *
-from shared_out import *
-
-
 
 doc = """
 2 firms complete in a market by setting prices for homogenous goods.
