@@ -42,14 +42,19 @@
       function loadImage(image_id) {
           feedback.style.display = 'none';
           images[image_id].style.display = 'block';
+          isRefractoryPeriod = false;
           displayed_timestamp = performance.now();
           setTimeout(() => {
             liveSend({'image_id': image_id, 'pressed': false})
           }, 3000);
       }
 
+      let isRefractoryPeriod = false;
+
       document.addEventListener("keypress", function (event) {
         if (event.key === '1') {
+          if (isRefractoryPeriod) return;
+          isRefractoryPeriod = true;
           liveSend({
               'image_id': image_id_global,
               'pressed': true,
