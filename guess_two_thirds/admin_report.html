@@ -1,20 +1,29 @@
 <table class="table">
     <tr>
-        <th>Average contribution</th>
-        <td>{{ avg_contribution }}</td>
+        <th>Average Guess</th>
+        <td>{{ avg_guess }}</td>
     </tr>
     <tr>
-        <th>Min contribution</th>
-        <td>{{ min_contribution }}</td>
+        <th>Two - Thirds of the Average Guess</th>
+        <td>{{ two_thirds_avg_guess }}</td>
     </tr>
     <tr>
-        <th>Max contribution</th>
-        <td>{{ max_contribution }}</td>
+        <th>Min Guess</th>
+        <td>{{ min_guess }}</td>
     </tr>
     <tr>
-        <th>Contributions Stats</th>
-        <td>{{ contributions_stats }}</td>
+        <th>Max Guess</th>
+        <td>{{ max_guess }}</td>
     </tr>
+    <tr>
+        <th>All Guesses</th>
+        <td>{{ all_guesses }}</td>
+    </tr>
+    <tr>
+        <th>Guesses Stats</th>
+        <td>{{ guesses_stats }}</td>
+    </tr>
+
 </table>
 
 <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -25,12 +34,12 @@
 <figure class="highcharts-figure">
     <div id="container"></div>
     <p class="highcharts-description">
-        Contributions upto the Current Round
+        Guesses upto the Current Round
     </p>
 </figure>
 
 <script>
-    let stats_obj = {{ contributions_stats|json }};
+    let stats_obj = {{ guesses_stats|json }};
     let statsJSON = [] ;
 
     if (stats_obj != '(no data)'){
@@ -46,16 +55,17 @@ Highcharts.chart('container', {
         type: 'column'
     },
     title: {
-        text: 'Contributions for All Rounds'
+        text: 'Guesses for All Rounds'
     },
     subtitle: {
-        text: 'Public Goods Game'
+        text: 'Keynesian Beauty Contest'
     },
     xAxis: {
         categories: [
             'Max',
             'Min',
-            'Average'
+            'Average',
+            '2/3rd Average'
         ],
         crosshair: true
     },
