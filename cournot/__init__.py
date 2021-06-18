@@ -1,5 +1,7 @@
 from otree.api import *
 
+from shared_out import get_or_none
+
 doc = """
 In Cournot competition, firms simultaneously decide the units of products to
 manufacture. The unit selling price depends on the total units produced. In
@@ -19,6 +21,39 @@ class Constants(BaseConstants):
 
 class Subsession(BaseSubsession):
     pass
+
+
+def vars_for_admin_report(subsession: Subsession):
+    units = [
+        p.units for p in subsession.get_players()
+        if get_or_none(p, 'units') != None
+    ]
+    player_ids = [
+        p.id_in_group for p in subsession.get_players()
+        if get_or_none(p, 'id_in_group') != None
+    ]
+    player_names = ["Player " + str(id) for id in player_ids]
+
+    player_profits = [
+        p.payoff for p in subsession.get_players()
+        if get_or_none(p, 'payoff') != None
+    ]
+    if units:
+        return dict(
+            avg_units=sum(units) / len(units),
+            min_units=min(units),
+            max_units=max(units),
+            player_names=player_names,
+            player_profits=player_profits
+        )
+    else:
+        return dict(
+            avg_units='(no data)',
+            min_units='(no data)',
+            max_units='(no data)',
+            player_names=player_names,
+            player_profits=[0] * len(player_ids)
+        )
 
 
 class Group(BaseGroup):
