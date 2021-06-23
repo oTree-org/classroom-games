@@ -42,12 +42,11 @@ def vars_for_admin_report(subsession: Subsession):
                 dict(
                 # player_position="Player "+ str(i), # this is only needed if the players
                 # dont have similar ids in the different groups
-                name="Player "+ str(p.id_in_group) + " per group",
+                name="Player "+ str(p.id_in_group),
                 data=[units]
                 )
             )
 
-    print("player_data-----", player_data)
 
     # match players in player data by index so that; the "first" player in each group
     # has units assigned for each highcharts series - design limitation by highcharts
@@ -59,9 +58,8 @@ def vars_for_admin_report(subsession: Subsession):
         else:
             player_data_matched[name] = player
 
-    player_data_matched = list(player_data_matched.values())  # convert the values to a list
-
-
+    # convert the values to a list
+    player_data_matched = list(player_data_matched.values())
     units_all_players = [
         p.units for p in subsession.get_players()
         if get_or_none(p, 'units') != None
