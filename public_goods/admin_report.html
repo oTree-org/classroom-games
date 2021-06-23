@@ -1,7 +1,9 @@
+<h3>Contributions for the Current Round</h3>
+
 <table class="table">
     <tr>
         <th>Average contribution</th>
-        <td>{{ avg_contribution }}</td>
+        <td>{{ avg_contribution|to0 }}</td>
     </tr>
     <tr>
         <th>Min contribution</th>
@@ -10,10 +12,6 @@
     <tr>
         <th>Max contribution</th>
         <td>{{ max_contribution }}</td>
-    </tr>
-    <tr>
-        <th>Contributions Stats</th>
-        <td>{{ contributions_stats }}</td>
     </tr>
 </table>
 
@@ -24,61 +22,60 @@
 
 <figure class="highcharts-figure">
     <div id="container"></div>
-    <p class="highcharts-description">
-        Contributions upto the Current Round
-    </p>
 </figure>
 
 <script>
-    let stats_obj = {{ contributions_stats|json }};
-    let statsJSON = [] ;
+    let contributions_obj = {{ all_contributions|json }};
+    let contribution_exists = {{ contribution_exists|json }};
+    let ppg = {{ players_per_group|json }}
 
-    if (stats_obj != '(no data)'){
-    for (key in stats_obj ) {
-        statsJSON.push({name : key, data : stats_obj[key]});
-    }}
+    var groups = [];
+    for (var i = 1; i <= ppg; i++) {
+        groups.push('Group ' + i);
+    }
 
-    console.log(stats_obj)
-    console.log(statsJSON)
+    var contributions_JSON = [] ;
 
-Highcharts.chart('container', {
-    chart: {
-        type: 'column'
-    },
-    title: {
-        text: 'Contributions for All Rounds'
-    },
-    subtitle: {
-        text: 'Public Goods Game'
-    },
-    xAxis: {
-        categories: [
-            'Max',
-            'Min',
-            'Average'
-        ],
-        crosshair: true
-    },
-    yAxis: {
-        min: 0,
-        title: {
-            text: 'Guesses'
+    if (contribution_exists) {
+        for (key in contributions_obj) {
+            contributions_JSON.push({name: key, data: contributions_obj[key]});
         }
-    },
-    tooltip: {
-        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-            '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
-        footerFormat: '</table>',
-        shared: true,
-        useHTML: true
-    },
-    plotOptions: {
-        column: {
-            pointPadding: 0.2,
-            borderWidth: 0
-        }
-    },
-    series: statsJSON
-});
+
+        Highcharts.chart('container', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Contributions for All Rounds'
+            },
+            subtitle: {
+                text: 'Public Goods Game'
+            },
+            xAxis: {
+                categories: groups,
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Guesses'
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: contributions_JSON
+        });
+    }
 </script>

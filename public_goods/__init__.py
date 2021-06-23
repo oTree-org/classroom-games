@@ -33,27 +33,26 @@ def vars_for_admin_report(subsession: Subsession):
     contributions_dict = {}
     for ss in subsession.in_all_rounds():
         round_contributions = [p.contribution for p in ss.get_players() if get_or_none(p, 'contribution') != None]
-        contributions_dict[ss.round_number] = round_contributions
+        contributions_dict['Round '+ str(ss.round_number)] = round_contributions
 
-    contributions_stats = {}
-    if contributions:
-        for key in contributions_dict.keys():
-            li = contributions_dict[key]
-            contributions_stats[key] = [max(li), min(li), (sum(li)/len(li))]
 
     if contributions:
         return dict(
+            contribution_exists=True,
+            players_per_group=len(subsession.get_players()),
             avg_contribution=sum(contributions) / len(contributions),
             min_contribution=min(contributions),
             max_contribution=max(contributions),
-            contributions_stats=contributions_stats
+            all_contributions=contributions_dict
         )
     else:
         return dict(
+            contribution_exists=False,
+            players_per_group=len(subsession.get_players()),
             avg_contribution='(no data)',
             min_contribution='(no data)',
             max_contribution='(no data)',
-            contributions_stats=contributions_stats
+            all_contributions=contributions_dict
         )
 
 
