@@ -24,41 +24,70 @@ class Subsession(BaseSubsession):
 
 
 def vars_for_admin_report(subsession: Subsession):
-    units = [
+    group_names = ["Group " + str(g.id_in_subsession) for g in subsession.get_groups()]
+    # todo id_in_subsession is wrong! fix later
+
+    # create player data list
+    player_data = []
+    for g in subsession.get_groups():
+        i = 0
+        for p in g.get_players():
+            i = i + 1
+            units = 0
+            if get_or_none(p, 'units') == None:
+                units = 0
+            else:
+                units = p.units
+            player_data.append(
+                dict(
+                # player_position="Player "+ str(i), # this is only needed if the players
+                # dont have similar ids in the different groups
+                name="Player "+ str(p.id_in_group) + " per group",
+                data=[units]
+                )
+            )
+
+    print("player_data-----", player_data)
+
+    # match players in player data by index so that; the "first" player in each group
+    # has units assigned for each highcharts series - design limitation by highcharts
+    player_data_matched = {}
+    for player in player_data:
+        name = player['name']
+        if name in player_data_matched.keys():
+            player_data_matched[name]['data'].append(player['data'][0])
+        else:
+            player_data_matched[name] = player
+
+    player_data_matched = list(player_data_matched.values())  # convert the values to a list
+
+
+    units_all_players = [
         p.units for p in subsession.get_players()
         if get_or_none(p, 'units') != None
     ]
-    player_ids = [
-        p.id_in_group for p in subsession.get_players()
-        if get_or_none(p, 'id_in_group') != None
-    ]
-    player_names = ["Player " + str(id) for id in player_ids]
-
-    player_profits = [
-        p.payoff for p in subsession.get_players()
-        if get_or_none(p, 'payoff') != None
-    ]
-    if units:
+    if units_all_players:
         return dict(
-            avg_units=sum(units) / len(units),
-            min_units=min(units),
-            max_units=max(units),
-            player_names=player_names,
-            player_profits=player_profits
+            avg_units=sum(units_all_players) / len(units_all_players),
+            min_units=min(units_all_players),
+            max_units=max(units_all_players),
+            group_names=group_names,
+            player_data_matched=player_data_matched
         )
     else:
         return dict(
             avg_units='(no data)',
             min_units='(no data)',
             max_units='(no data)',
-            player_names=player_names,
-            player_profits=[0] * len(player_ids)
+            group_names=group_names,
+            player_data_matched=player_data_matched
         )
 
 
 class Group(BaseGroup):
     unit_price = models.CurrencyField()
     total_units = models.IntegerField(doc="""Total units produced by all players""")
+    name = models.StringField()
 
 
 class Player(BasePlayer):

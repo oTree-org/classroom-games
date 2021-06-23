@@ -1,4 +1,59 @@
 <script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+<figure class="highcharts-figure">
+    <div id="container"></div>
+    <p class="highcharts-description">
+        Each section shows the units selected by members in a group.
+        An additional column indicates how many units the least user
+        would have chosen..... complete this..
+    </p>
+</figure>
+<script>
+    let group_names = {{ group_names|json }}
+    let player_data_matched = {{ player_data_matched|json }}
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const chart = Highcharts.chart('container', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Units produced per player per group'
+            },
+            subtitle: {
+                text: 'Refresh for new results if players are still playing'
+            },
+            xAxis: {
+                categories: group_names,
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Units produced'
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.1f} units</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: player_data_matched
+        });
+    });
+</script>
 
 <table class="table">
     <tr>
@@ -14,34 +69,3 @@
         <td>{{ max_units }}</td>
     </tr>
 </table>
-
-
-<div id="highchart" style="width:100%; height:400px;"></div>
-
-<script>
-    let player_names = {{ player_names|json }}
-    let player_profits = {{ player_profits|json }}
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const chart = Highcharts.chart('highchart', {
-            chart: {
-                type: 'bar'
-            },
-            title: {
-                text: 'Profit for each player'
-            },
-            xAxis: {
-                categories: player_names
-            },
-            yAxis: {
-                title: {
-                    text: 'Profit'
-                }
-            },
-            series: [{
-                name: 'Profit',
-                data: player_profits
-            }]
-        });
-    });
-</script>
