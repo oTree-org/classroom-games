@@ -1,11 +1,13 @@
+<h3>Guesses for the Current Round</h3>
+
 <table class="table">
     <tr>
         <th>Average Guess</th>
-        <td>{{ avg_guess }}</td>
+        <td>{{ avg_guess|to2 }}</td>
     </tr>
     <tr>
         <th>Two - Thirds of the Average Guess</th>
-        <td>{{ two_thirds_avg_guess }}</td>
+        <td>{{ two_thirds_avg_guess|to2 }}</td>
     </tr>
     <tr>
         <th>Min Guess</th>
@@ -15,15 +17,6 @@
         <th>Max Guess</th>
         <td>{{ max_guess }}</td>
     </tr>
-    <tr>
-        <th>All Guesses</th>
-        <td>{{ all_guesses }}</td>
-    </tr>
-    <tr>
-        <th>Guesses Stats</th>
-        <td>{{ guesses_stats }}</td>
-    </tr>
-
 </table>
 
 <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -33,62 +26,60 @@
 
 <figure class="highcharts-figure">
     <div id="container"></div>
-    <p class="highcharts-description">
-        Guesses upto the Current Round
-    </p>
 </figure>
 
 <script>
-    let stats_obj = {{ guesses_stats|json }};
-    let statsJSON = [] ;
+    let guesses_obj = {{ all_guesses|json }};
+    let guess_exists = {{ guess_exists|json }};
+    let ppg = {{ players_per_group|json }}
 
-    if (stats_obj != '(no data)'){
-    for (key in stats_obj ) {
-        statsJSON.push({name : key, data : stats_obj[key]});
-    }}
+    var groups = [];
+    for (var i = 1; i <= ppg; i++) {
+        groups.push('Group ' + i);
+    }
 
-    console.log(stats_obj)
-    console.log(statsJSON)
+    var guesses_JSON = [] ;
 
-Highcharts.chart('container', {
-    chart: {
-        type: 'column'
-    },
-    title: {
-        text: 'Guesses for All Rounds'
-    },
-    subtitle: {
-        text: 'Keynesian Beauty Contest'
-    },
-    xAxis: {
-        categories: [
-            'Max',
-            'Min',
-            'Average',
-            '2/3rd Average'
-        ],
-        crosshair: true
-    },
-    yAxis: {
-        min: 0,
-        title: {
-            text: 'Guesses'
+    if (guess_exists) {
+        for (key in guesses_obj) {
+            guesses_JSON.push({name: key, data: guesses_obj[key]});
         }
-    },
-    tooltip: {
-        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-            '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
-        footerFormat: '</table>',
-        shared: true,
-        useHTML: true
-    },
-    plotOptions: {
-        column: {
-            pointPadding: 0.2,
-            borderWidth: 0
-        }
-    },
-    series: statsJSON
-});
+
+        Highcharts.chart('container', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Guesses for All Rounds'
+            },
+            subtitle: {
+                text: 'Keynesian Beauty Contest'
+            },
+            xAxis: {
+                categories: groups,
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Guesses'
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: guesses_JSON
+        });
+    }
 </script>

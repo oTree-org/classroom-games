@@ -36,31 +36,27 @@ def vars_for_admin_report(subsession: Subsession):
     guesses_dict = {}
     for ss in subsession.in_all_rounds():
         round_guesses = [p.guess for p in ss.get_players() if get_or_none(p, 'guess') != None]
-        guesses_dict[ss.round_number] = round_guesses
-
-    guesses_stats = {}
-    if guesses:
-        for key in guesses_dict.keys():
-            li = guesses_dict[key]
-            guesses_stats[key] = [max(li), min(li), (sum(li)/len(li)), 2*(sum(li)/len(li))/3]
+        guesses_dict['Round '+ str(ss.round_number)] = round_guesses
 
     if guesses:
         return dict(
+            guess_exists=True,
+            players_per_group=Constants.players_per_group,
             avg_guess=sum(guesses) / len(guesses),
             two_thirds_avg_guess=(2 * (sum(guesses) / len(guesses)) / 3),
             min_guess=min(guesses),
             max_guess=max(guesses),
             all_guesses=guesses_dict,
-            guesses_stats=guesses_stats
         )
     else:
         return dict(
+            guess_exists=False,
+            players_per_group=Constants.players_per_group,
             avg_guess='(no data)',
             two_thirds_avg_guess='(no data)',
             min_guess='(no data)',
             max_guess='(no data)',
-            all_guesses='(no data)',
-            guesses_stats='(no data)'
+            all_guesses='(no data)'
         )
 
 class Group(BaseGroup):
