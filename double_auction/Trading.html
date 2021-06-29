@@ -21,7 +21,7 @@ Trade
                 (you should sell for more than)
             {{ endif }}
         </td>
-        <th>
+        <th id="break_even">
             {{ player.break_even_point }}
         </th>
     </tr>
@@ -83,7 +83,7 @@ Trade
     function liveRecv(data) {
         console.log(data)
         // javascript destructuring assignment
-        let {bids, asks, highcharts_series, num_items, current_offer, payoff, news} = data;
+        let {bids, asks, highcharts_series, num_items, current_offer, payoff, news, break_even} = data;
         if (news) {
             let {buyer, seller, price} = news;
             if (buyer === my_id) {
@@ -95,6 +95,7 @@ Trade
         document.getElementById('num_items').innerText = num_items;
         document.getElementById('current_offer').innerText = cu(current_offer);
         document.getElementById('payoff').innerText = cu(payoff);
+        document.getElementById('break_even').innerText = cu(break_even);
         if (!is_buyer && num_items === 0) {
             btnOffer.disabled = true;
         }

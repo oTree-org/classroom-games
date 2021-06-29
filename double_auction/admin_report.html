@@ -1,0 +1,71 @@
+<h3>Bids for the Current Round</h3>
+
+<table class="table">
+    <tr>
+        <th>Average Bid</th>
+        <td>50</td>
+    </tr>
+    <tr>
+        <th>Minimum Bid</th>
+        <td>70</td>
+    </tr>
+    <tr>
+        <th>Maximum Bid</th>
+        <td>80</td>
+    </tr>
+</table>
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/series-label.js"></script>
+
+<div id="highchart">
+
+</div>
+
+<script>
+    let transactions = {{ transactions|json }};
+    let break_even_players = {{ break_even_players|json }};
+    let num_players = {{ num_players|json }};
+
+    var series_JSON = [] ;
+
+    series_JSON.push({name: 'Transactions', data: transactions});
+
+    for (key in break_even_players) {
+        series_JSON.push({name: key, data: break_even_players[key]});
+    }
+
+
+    Highcharts.chart('highchart', {
+
+        title: {
+            text: 'Trade history'
+        },
+
+        yAxis: {
+            title: {
+                text: 'Price'
+            }
+        },
+
+        xAxis: {
+            title: {
+                text: 'Time (seconds)'
+            },
+            min: 0
+        },
+
+        plotOptions: {
+            series: {
+                label: {
+                    enabled: false
+                },
+            }
+        },
+
+        series: series_JSON
+
+    });
+
+
+</script>
