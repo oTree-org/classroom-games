@@ -47,6 +47,9 @@ def vars_for_admin_report(subsession: Subsession):
                 )
             )
 
+    # todo
+    # sort from least total units per group to highest on graph - this not possible/complicated with highcharts
+    # use table to show optimal outcome (put table on top) - try "color by value in excel "
 
     # match players in player data by index so that; the "first" player in each group
     # has units assigned for each highcharts series - design limitation by highcharts
@@ -60,10 +63,25 @@ def vars_for_admin_report(subsession: Subsession):
 
     # convert the values to a list
     player_data_matched = list(player_data_matched.values())
+
+    optimal_units = [
+        g.optimal_units
+        for g in subsession.get_groups()
+        if get_or_none(g, 'optimal_units') != None
+    ]
+
+    # add optimal units to player_data_matched list
+    player_data_matched.append(dict(
+        name='Optimal Units',
+        color='#00FF00',
+        data=optimal_units
+    ))
+
     units_all_players = [
         p.units for p in subsession.get_players()
         if get_or_none(p, 'units') != None
     ]
+
     if units_all_players:
         return dict(
             avg_units=sum(units_all_players) / len(units_all_players),
@@ -86,6 +104,7 @@ class Group(BaseGroup):
     unit_price = models.CurrencyField()
     total_units = models.IntegerField(doc="""Total units produced by all players""")
     name = models.StringField()
+    optimal_units = models.IntegerField(doc="""Optimal for maximum profit""")
 
 
 class Player(BasePlayer):
@@ -102,6 +121,7 @@ def set_payoffs(group: Group):
     players = group.get_players()
     group.total_units = sum([p.units for p in players])
     group.unit_price = Constants.total_capacity - group.total_units
+    group.optimal_units = group.total_units # todo make an actual calculation here!! the sum is a placeholder
     for p in players:
         p.payoff = group.unit_price * p.units
 
