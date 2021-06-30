@@ -40,10 +40,10 @@ def vars_for_admin_report(subsession: Subsession):
                 units = p.units
             player_data.append(
                 dict(
-                # player_position="Player "+ str(i), # this is only needed if the players
-                # dont have similar ids in the different groups
-                name="Player "+ str(p.id_in_group),
-                data=[units]
+                    # player_position="Player "+ str(i), # this is only needed if the players
+                    # dont have similar ids in the different groups
+                    name="Player " + str(p.id_in_group),
+                    data=[units]
                 )
             )
 
@@ -64,17 +64,17 @@ def vars_for_admin_report(subsession: Subsession):
     # convert the values to a list
     player_data_matched = list(player_data_matched.values())
 
-    optimal_units = [
-        g.optimal_units
+    lowest_payoff_best_response_function = [
+        g.lowest_payoff_best_response_function
         for g in subsession.get_groups()
-        if get_or_none(g, 'optimal_units') != None
+        if get_or_none(g, 'lowest_payoff_best_response_function') != None
     ]
 
-    # add optimal units to player_data_matched list
+    # add bfr units to player_data_matched list
     player_data_matched.append(dict(
-        name='Optimal Units',
+        name='Best response function units for player with least payoff',
         color='#00FF00',
-        data=optimal_units
+        data=lowest_payoff_best_response_function
     ))
 
     units_all_players = [
@@ -82,13 +82,16 @@ def vars_for_admin_report(subsession: Subsession):
         if get_or_none(p, 'units') != None
     ]
 
+    nash_equilibrium=(Constants.total_capacity/3) * Constants.players_per_group
+
     if units_all_players:
         return dict(
             avg_units=sum(units_all_players) / len(units_all_players),
             min_units=min(units_all_players),
             max_units=max(units_all_players),
             group_names=group_names,
-            player_data_matched=player_data_matched
+            player_data_matched=player_data_matched,
+            nash_equilibrium=nash_equilibrium
         )
     else:
         return dict(
@@ -96,7 +99,8 @@ def vars_for_admin_report(subsession: Subsession):
             min_units='(no data)',
             max_units='(no data)',
             group_names=group_names,
-            player_data_matched=player_data_matched
+            player_data_matched=player_data_matched,
+            nash_equilibrium=nash_equilibrium
         )
 
 
@@ -104,7 +108,10 @@ class Group(BaseGroup):
     unit_price = models.CurrencyField()
     total_units = models.IntegerField(doc="""Total units produced by all players""")
     name = models.StringField()
-    optimal_units = models.IntegerField(doc="""Optimal for maximum profit""")
+    player_with_lowest_payoff = models.StringField()
+    lowest_payoff_best_response_function = models.FloatField(
+        doc="""Highest number of units for lowest payoff player"""
+    )
 
 
 class Player(BasePlayer):
@@ -121,7 +128,12 @@ def set_payoffs(group: Group):
     players = group.get_players()
     group.total_units = sum([p.units for p in players])
     group.unit_price = Constants.total_capacity - group.total_units
-    group.optimal_units = group.total_units # todo make an actual calculation here!! the sum is a placeholder
+
+    lower_payoff = min([p.units for p in players])
+    group.player_with_lowest_payoff = "Player " + str(
+        next((p.id_in_group for p in players if p.units == lower_payoff), None)
+    ) # currently not in use but could come in handy
+    group.lowest_payoff_best_response_function = (Constants.total_capacity - lower_payoff)/2
     for p in players:
         p.payoff = group.unit_price * p.units
 

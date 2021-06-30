@@ -6,8 +6,16 @@
 <figure class="highcharts-figure">
     <div id="container"></div>
     <p class="highcharts-description">
-        Each section in the graph above shows the units selected by members in a group.
+        The blue bars indicate the units produced per group.
+        The green bar indicates the best response function for the player with the lower profit,
+        in comparison with the player with the highest profit. i.e:
     </p>
+
+    <p class="highcharts-description">
+    "How many units should the lowest profit firm (player) have produced inorder to maximise their profit, given the units
+        produced by the other firm?(player)"
+    </p>
+
 </figure>
 <script>
     let group_names = {{ group_names|json }}
@@ -19,7 +27,7 @@
                 type: 'column'
             },
             title: {
-                text: 'Units produced per player per group'
+                text: 'Units produced per player, and best response function for lowest profit'
             },
             subtitle: {
                 text: 'Refresh for new results if players are still playing'
@@ -49,11 +57,20 @@
                 }
             },
             series: player_data_matched,
-            colors: ['#4572A7'] //use same color for all bars inorder to show that users in a single group actually play
+            colors: ['#4572A7'] //use same color for all non-optimal bars inorder to show that users in a single group actually play
             // together and may represent the same user
         });
     });
 </script>
+
+<p><b>Nash Equilibrium</b></p>
+The Cournot experiment is ultimately used to compare the output of a monopolist in the same market conditions as used in this game.
+In this market, the monopoly optimal quantity will always be lower than the duopolist's combined output at the Nash Equilibrium: {{ nash_equilibrium }}.
+
+This proves that as Cournot concluded, "As everyone believes without any analysis, competition reduces the market price".
+
+<p>Quiz: What is the monopolist optimal output in this market?</p>
+
 
 <table class="table">
     <tr>
