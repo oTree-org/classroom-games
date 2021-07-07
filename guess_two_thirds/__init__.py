@@ -23,41 +23,48 @@ class Constants(BaseConstants):
 class Subsession(BaseSubsession):
     pass
 
+
 def creating_session(subsession: Subsession):
     set_players_per_group(subsession)
 
+
 def vars_for_admin_report(subsession: Subsession):
     guesses = [
-        p.guess
-        for p in subsession.get_players()
-        if get_or_none(p, 'guess') != None
+        p.guess for p in subsession.get_players() if get_or_none(p, 'guess') != None
     ]
 
-    guesses_dict = {}
+    all_guesses = []
     for ss in subsession.in_all_rounds():
-        round_guesses = [p.guess for p in ss.get_players() if get_or_none(p, 'guess') != None]
-        guesses_dict['Round '+ str(ss.round_number)] = round_guesses
+        round_guesses = [
+            p.guess for p in ss.get_players() if get_or_none(p, 'guess') != None
+        ]
+        all_guesses.append(
+            {'name': 'Round {}'.format(ss.round_number), 'data': round_guesses}
+        )
 
     if guesses:
         return dict(
             guess_exists=True,
-            players_per_group=Constants.players_per_group,
             avg_guess=sum(guesses) / len(guesses),
             two_thirds_avg_guess=(2 * (sum(guesses) / len(guesses)) / 3),
             min_guess=min(guesses),
             max_guess=max(guesses),
-            all_guesses=guesses_dict,
+            all_guesses=all_guesses,
+            players=[
+                'Player {}'.format(i) for i in range(1, Constants.players_per_group + 1)
+            ],
         )
     else:
         return dict(
             guess_exists=False,
-            players_per_group=Constants.players_per_group,
             avg_guess='(no data)',
             two_thirds_avg_guess='(no data)',
             min_guess='(no data)',
             max_guess='(no data)',
-            all_guesses='(no data)'
+            all_guesses='(no data)',
+            players='(no data)',
         )
+
 
 class Group(BaseGroup):
     two_thirds_avg = models.FloatField()
@@ -88,10 +95,6 @@ def set_payoffs(group: Group):
 
 def two_thirds_avg_history(group: Group):
     return [g.two_thirds_avg for g in group.in_previous_rounds()]
-
-
-
-
 
 
 class Introduction(Page):

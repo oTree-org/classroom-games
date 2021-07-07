@@ -25,22 +25,13 @@
 </figure>
 
 <script>
-    let contributions_obj = {{ all_contributions|json }};
+    let all_contributions = {{ all_contributions|json }};
     let contribution_exists = {{ contribution_exists|json }};
-    let ppg = {{ players_per_group|json }}
+    let players = {{ players|json }};
 
-    var groups = [];
-    for (var i = 1; i <= ppg; i++) {
-        groups.push('Group ' + i);
-    }
-
-    var contributions_JSON = [] ;
+    let contributions_JSON = [] ;
 
     if (contribution_exists) {
-        for (key in contributions_obj) {
-            contributions_JSON.push({name: key, data: contributions_obj[key]});
-        }
-
         Highcharts.chart('container', {
             chart: {
                 type: 'column'
@@ -52,13 +43,13 @@
                 text: 'Public Goods Game'
             },
             xAxis: {
-                categories: groups,
+                categories: players,
                 crosshair: true
             },
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'Guesses'
+                    text: 'Contributions'
                 }
             },
             tooltip: {
@@ -75,7 +66,7 @@
                     borderWidth: 0
                 }
             },
-            series: contributions_JSON
+            series: all_contributions
         });
     }
 </script>

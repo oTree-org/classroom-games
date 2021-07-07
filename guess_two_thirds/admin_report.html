@@ -29,21 +29,13 @@
 </figure>
 
 <script>
-    let guesses_obj = {{ all_guesses|json }};
+    let all_guesses = {{ all_guesses|json }};
     let guess_exists = {{ guess_exists|json }};
-    let ppg = {{ players_per_group|json }}
+    let players = {{ players|json }}
 
-    var groups = [];
-    for (var i = 1; i <= ppg; i++) {
-        groups.push('Group ' + i);
-    }
-
-    var guesses_JSON = [] ;
+    let guesses_JSON = [] ;
 
     if (guess_exists) {
-        for (key in guesses_obj) {
-            guesses_JSON.push({name: key, data: guesses_obj[key]});
-        }
 
         Highcharts.chart('container', {
             chart: {
@@ -56,7 +48,7 @@
                 text: 'Keynesian Beauty Contest'
             },
             xAxis: {
-                categories: groups,
+                categories: players,
                 crosshair: true
             },
             yAxis: {
@@ -79,7 +71,7 @@
                     borderWidth: 0
                 }
             },
-            series: guesses_JSON
+            series: all_guesses
         });
     }
 </script>

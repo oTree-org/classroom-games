@@ -87,7 +87,8 @@ Trade
         if (news) {
             let {buyer, seller, price} = news;
             if (buyer === my_id) {
-                showNews(`You bought from player ${seller} for ${cu(price)}`);
+                showNews(`You bought from player ${seller} for ${cu(price)}.
+                Your new break-even point is ${cu(break_even)}`);
             } else if (seller === my_id) {
                 showNews(`You sold to player ${buyer} for ${cu(price)}`);
             }

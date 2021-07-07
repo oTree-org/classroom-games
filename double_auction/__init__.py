@@ -2,7 +2,6 @@ from otree.api import *
 from shared_out import set_players_per_group
 import time
 import random
-import ast
 
 
 class Constants(BaseConstants):
@@ -26,9 +25,13 @@ def creating_session(subsession: Subsession):
     for p in players:
         # for more buyers, change the 2 to 3
         p.is_buyer = p.id_in_group % 2 > 0
+        participant = p.participant
+        participant.transaction_history = []
         if p.is_buyer:
             p.num_items = 0
-            p.break_even_point = random.randint(Constants.valuation_min, Constants.valuation_max)
+            p.break_even_point = random.randint(
+                Constants.valuation_min, Constants.valuation_max
+            )
             p.current_offer = 0
         else:
             p.num_items = Constants.items_per_seller
@@ -36,22 +39,32 @@ def creating_session(subsession: Subsession):
                 Constants.production_costs_min, Constants.production_costs_max
             )
             p.current_offer = Constants.valuation_max + 1
-        p.break_even_history = '[0,' + str(p.break_even_point) + ']'
+        participant.transaction_history.append([0, int(p.break_even_point)])
+
 
 def vars_for_admin_report(subsession: Subsession):
     players = subsession.get_players()
     group = players[0].group
 
-    break_even_players = {player.id_in_group : ast.literal_eval('[ ' + player.break_even_history + ' ]')
-                          for player in players}
+    break_evens = {
+        player.id_in_group: player.participant.transaction_history for player in players
+    }
+    highcharts_series = []
 
-    transactions = [[tx.seconds, tx.price] for tx in Transaction.filter(group=group)]
+    for key in break_evens.keys():
+        highcharts_series.append(
+            {'name': 'Player {}'.format(key), 'data': break_evens[key], 'type': 'line'}
+        )
 
-    return dict(
-        transactions=transactions,
-        break_even_players=break_even_players,
-        num_players=len(players)
+    highcharts_series.append(
+        {
+            'name': 'Transactions',
+            'data': [[tx.seconds, tx.price] for tx in Transaction.filter(group=group)],
+            'type': 'scatter',
+        }
     )
+
+    return dict(highcharts_series=highcharts_series)
 
 
 class Group(BaseGroup):
@@ -63,7 +76,7 @@ class Player(BasePlayer):
     current_offer = models.CurrencyField()
     break_even_point = models.CurrencyField()
     num_items = models.IntegerField()
-    break_even_history = models.StringField()
+
 
 class Transaction(ExtraModel):
     group = models.Link(Group)
@@ -102,11 +115,7 @@ def live_method(player: Player, data):
             price = buyer.current_offer
             seconds = int(time.time() - group.start_timestamp)
             Transaction.create(
-                group=group,
-                buyer=buyer,
-                seller=seller,
-                price=price,
-                seconds=seconds,
+                group=group, buyer=buyer, seller=seller, price=price, seconds=seconds,
             )
             buyer.num_items += 1
             seller.num_items -= 1
@@ -114,15 +123,26 @@ def live_method(player: Player, data):
             seller.payoff += price - seller.break_even_point
             buyer.current_offer = 0
             seller.current_offer = Constants.valuation_max + 1
-            buyer.break_even_point = random.randint(Constants.valuation_min, buyer.break_even_point)
-            buyer.break_even_history += ',[ ' + str(seconds) + ',' + str(buyer.break_even_point) + ']'
-            seller.break_even_point = random.randint(seller.break_even_point, Constants.production_costs_max)
-            seller.break_even_history += ',[ ' + str(seconds) + ',' + str(seller.break_even_point) + ']'
+            buyer.break_even_point = random.randint(
+                Constants.valuation_min, buyer.break_even_point
+            )
+            buyer.participant.transaction_history.append(
+                [seconds, int(buyer.break_even_point)]
+            )
+            seller.participant.transaction_history.append(
+                [seconds, int(seller.break_even_point)]
+            )
             news = dict(buyer=buyer.id_in_group, seller=seller.id_in_group, price=price)
 
-    bids = sorted([p.current_offer for p in buyers if p.current_offer > 0], reverse=True)
-    asks = sorted([p.current_offer for p in sellers if p.current_offer <= Constants.valuation_max])
-    highcharts_series = [[tx.seconds, tx.price] for tx in Transaction.filter(group=group)]
+    bids = sorted(
+        [p.current_offer for p in buyers if p.current_offer > 0], reverse=True
+    )
+    asks = sorted(
+        [p.current_offer for p in sellers if p.current_offer <= Constants.valuation_max]
+    )
+    highcharts_series = [
+        [tx.seconds, tx.price] for tx in Transaction.filter(group=group)
+    ]
 
     return {
         p.id_in_group: dict(
@@ -133,7 +153,7 @@ def live_method(player: Player, data):
             current_offer=p.current_offer,
             news=news,
             payoff=p.payoff,
-            break_even=p.break_even_point
+            break_even=p.break_even_point,
         )
         for p in players
     }
