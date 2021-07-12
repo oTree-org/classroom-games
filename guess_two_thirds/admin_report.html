@@ -1,17 +1,21 @@
-<h3>Contributions for the Current Round</h3>
+<h3>Guesses for the Current Round</h3>
 
 <table class="table">
     <tr>
-        <th>Average contribution</th>
-        <td>{{ avg_contribution|to0 }}</td>
+        <th>Average Guess</th>
+        <td>{{ avg_guess|to0 }}</td>
     </tr>
     <tr>
-        <th>Min contribution</th>
-        <td>{{ min_contribution }}</td>
+        <th>Two - Thirds of the Average Guess</th>
+        <td>{{ two_thirds_avg_guess|to0 }}</td>
     </tr>
     <tr>
-        <th>Max contribution</th>
-        <td>{{ max_contribution }}</td>
+        <th>Minimum Guess</th>
+        <td>{{ min_guess }}</td>
+    </tr>
+    <tr>
+        <th>Maximum Guess</th>
+        <td>{{ max_guess }}</td>
     </tr>
 </table>
 
@@ -25,22 +29,23 @@
 </figure>
 
 <script>
-    let all_contributions = {{ all_contributions|json }};
-    let contribution_exists = {{ contribution_exists|json }};
-    let players = {{ players|json }};
+    let all_guesses = {{ all_guesses|json }};
+    let guess_exists = {{ guess_exists|json }};
+    let players = {{ players|json }}
 
-    let contributions_JSON = [] ;
+    let guesses_JSON = [] ;
 
-    if (contribution_exists) {
+    if (guess_exists) {
+
         Highcharts.chart('container', {
             chart: {
                 type: 'column'
             },
             title: {
-                text: 'Contributions for All Rounds'
+                text: 'Guesses for All Rounds'
             },
             subtitle: {
-                text: 'Public Goods Game'
+                text: 'Keynesian Beauty Contest'
             },
             xAxis: {
                 categories: players,
@@ -49,7 +54,7 @@
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'Contributions'
+                    text: 'Guesses'
                 }
             },
             tooltip: {
@@ -66,7 +71,7 @@
                     borderWidth: 0
                 }
             },
-            series: all_contributions
+            series: all_guesses
         });
     }
 </script>

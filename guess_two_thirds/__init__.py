@@ -1,5 +1,5 @@
 from otree.api import *
-from shared_out import set_players_per_group
+from shared_out import set_players_per_group, get_or_none
 
 
 doc = """
@@ -17,13 +17,53 @@ class Constants(BaseConstants):
     jackpot = Currency(100)
     guess_max = 100
     instructions_template = 'guess_two_thirds/instructions.html'
+    charts_template = 'guess_two_thirds/Charts.html'
 
 
 class Subsession(BaseSubsession):
     pass
 
+
 def creating_session(subsession: Subsession):
     set_players_per_group(subsession)
+
+
+def vars_for_admin_report(subsession: Subsession):
+    guesses = [
+        p.guess for p in subsession.get_players() if get_or_none(p, 'guess') != None
+    ]
+
+    all_guesses = []
+    for ss in subsession.in_all_rounds():
+        round_guesses = [
+            p.guess for p in ss.get_players() if get_or_none(p, 'guess') != None
+        ]
+        all_guesses.append(
+            {'name': 'Round {}'.format(ss.round_number), 'data': round_guesses}
+        )
+
+    if guesses:
+        return dict(
+            guess_exists=True,
+            avg_guess=sum(guesses) / len(guesses),
+            two_thirds_avg_guess=(2 * (sum(guesses) / len(guesses)) / 3),
+            min_guess=min(guesses),
+            max_guess=max(guesses),
+            all_guesses=all_guesses,
+            players=[
+                'Player {}'.format(i) for i in range(1, Constants.players_per_group + 1)
+            ],
+        )
+    else:
+        return dict(
+            guess_exists=False,
+            avg_guess='(no data)',
+            two_thirds_avg_guess='(no data)',
+            min_guess='(no data)',
+            max_guess='(no data)',
+            all_guesses='(no data)',
+            players='(no data)',
+        )
 
 
 class Group(BaseGroup):
