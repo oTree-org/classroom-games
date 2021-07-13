@@ -42,6 +42,12 @@ def vars_for_admin_report(subsession: Subsession):
             {'name': 'Round {}'.format(ss.round_number), 'data': round_guesses}
         )
 
+    players = []
+    if guesses:
+        for i in range(1, len(ss.get_groups()) + 1):
+            for j in range(1, len(ss.get_group_matrix()[0]) + 1):
+                players.append('Group {} Player {}'.format(i, j))
+
     if guesses:
         return dict(
             guess_exists=True,
@@ -50,9 +56,7 @@ def vars_for_admin_report(subsession: Subsession):
             min_guess=min(guesses),
             max_guess=max(guesses),
             all_guesses=all_guesses,
-            players=[
-                'Player {}'.format(i) for i in range(1, Constants.players_per_group + 1)
-            ],
+            players=players,
         )
     else:
         return dict(

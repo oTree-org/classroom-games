@@ -10,7 +10,7 @@ This is a one-period public goods game with 3 players.
 class Constants(BaseConstants):
     name_in_url = 'public_goods'
     players_per_group = None
-    num_rounds = 1
+    num_rounds = 3
     instructions_template = 'public_goods/instructions.html'
     # """Amount allocated to each player"""
 
@@ -41,18 +41,20 @@ def vars_for_admin_report(subsession: Subsession):
             {'name': 'Round {}'.format(ss.round_number), 'data': round_contributions}
         )
 
+    players = []
+    if contributions:
+        for i in range(1, len(ss.get_groups()) + 1):
+            for j in range(1, len(ss.get_group_matrix()[0]) + 1):
+                players.append('Group {} Player {}'.format(i, j))
+
     if contributions:
         return dict(
             contribution_exists=True,
-            players_per_group=len(subsession.get_players()),
             avg_contribution=sum(contributions) / len(contributions),
             min_contribution=min(contributions),
             max_contribution=max(contributions),
             all_contributions=all_contributions,
-            players=[
-                'Player {}'.format(i)
-                for i in range(1, len(subsession.get_players()) + 1)
-            ],
+            players=players,
         )
     else:
         return dict(

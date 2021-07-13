@@ -29,8 +29,6 @@
     let contribution_exists = {{ contribution_exists|json }};
     let players = {{ players|json }};
 
-    let contributions_JSON = [] ;
-
     if (contribution_exists) {
         Highcharts.chart('container', {
             chart: {

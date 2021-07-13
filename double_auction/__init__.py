@@ -43,26 +43,39 @@ def creating_session(subsession: Subsession):
 
 
 def vars_for_admin_report(subsession: Subsession):
-    players = subsession.get_players()
-    group = players[0].group
+    groups = subsession.get_groups()
 
-    break_evens = {
-        player.id_in_group: player.participant.transaction_history for player in players
-    }
+    break_evens = {}
+    transaction_data = {}
+    group_counter = 0
+
+    for group in groups:
+        group_counter += 1
+        players = group.get_players()
+        break_evens_group = {
+            'BE: G{}-P{}'.format(
+                group_counter, player.id_in_group
+            ): player.participant.transaction_history
+            for player in players
+        }
+        break_evens.update(break_evens_group)
+        for tx in Transaction.filter(group=group):
+            key = 'Transactions: G{}'.format(group_counter)
+            if key not in transaction_data:
+                transaction_data[key] = []
+            transaction_data[key].append([tx.seconds, tx.price])
+
     highcharts_series = []
 
     for key in break_evens.keys():
         highcharts_series.append(
-            {'name': 'Player {}'.format(key), 'data': break_evens[key], 'type': 'line'}
+            {'name': key, 'data': break_evens[key], 'type': 'line'}
         )
 
-    highcharts_series.append(
-        {
-            'name': 'Transactions',
-            'data': [[tx.seconds, tx.price] for tx in Transaction.filter(group=group)],
-            'type': 'scatter',
-        }
-    )
+    for key in transaction_data.keys():
+        highcharts_series.append(
+            {'name': key, 'data': transaction_data[key], 'type': 'scatter',}
+        )
 
     return dict(highcharts_series=highcharts_series)
 
