@@ -31,12 +31,9 @@ class Group(BaseGroup):
         label="Please enter an offer amount between 0 to 100:",
     )
     offer_accepted = models.BooleanField(
-        choices=[
-            [True, 'Accept'],
-            [False, 'Reject'],
-        ],
+        choices=[[True, 'Accept'], [False, 'Reject'],],
         label="Do you accept or reject Participant A's offer?",
-        doc="""Whether Participant A's offer has been accepted by B"""
+        doc="""Whether Participant A's offer has been accepted by B""",
     )
 
 
@@ -45,6 +42,7 @@ class Player(BasePlayer):
 
 
 # FUNCTIONS
+
 
 def set_payoffs(group: Group):
     p1 = group.get_player_by_id(1)
@@ -57,6 +55,7 @@ def set_payoffs(group: Group):
     else:
         p1.payoff = Constants.reject_payoff
         p2.payoff = Constants.reject_payoff
+
 
 # PAGES
 class Introduction(Page):
@@ -109,8 +108,7 @@ class Results(Page):
     def vars_for_template(player: Player):
         group = player.group
 
-        return dict(offer=group.offer,
-                    offer_accepted=group.offer_accepted)
+        return dict(offer=group.offer, offer_accepted=group.offer_accepted)
 
 
 page_sequence = [
