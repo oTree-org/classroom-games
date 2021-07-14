@@ -1,0 +1,12 @@
+{{ block title }}Your Choice{{ endblock }}
+{{ block content }}
+    <p>
+        You are <b>Participant B.</b>
+        Participant A offered you {{ group.offer }}.
+    </p>
+    {{ formfields }}
+
+    <p>{{ next_button }}</p>
+    {{ include Constants.instructions_template }}
+
+{{ endblock }}

@@ -69,6 +69,12 @@ SESSION_CONFIGS = [
         app_sequence=['trust'],
     ),
     dict(
+        name='ultimatum',
+        display_name="Ultimatum Game",
+        num_demo_participants=2,
+        app_sequence=['ultimatum'],
+    ),
+    dict(
         name='prisoner',
         display_name="Prisoner's Dilemma",
         num_demo_participants=2,

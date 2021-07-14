@@ -1,0 +1,29 @@
+<div class="card bg-light m-3">
+    <div class="card-body">
+
+        <h3>
+            Instructions
+        </h3>
+        <p>
+            You have been randomly and anonymously paired with another participant.
+            One of you will be selected at random to be participant A;
+            the other will be participant B.
+            You will learn whether you are participant A or B prior to making any
+            decision.
+        </p>
+        <p>
+            To start, participant A receives {{ Constants.endowment }};
+            participant B receives nothing.
+            Participant A can <b>offer</b> none, some or all of
+            their {{ Constants.endowment }} to participant B.
+        </p>
+        <p>Participant B can then chose to <b>Accept</b> or <b>Reject</b> the offer.</p>
+        <ul>
+            <li>If B accepts the offer, B receives the amount offered by A and A receives
+                what is left after subtracting the offer from {{ Constants.endowment }}
+            </li>
+            <li>If B rejects the offer, both A and B receive {{ Constants.reject_payoff }}</li>
+        </ul>
+
+    </div>
+</div>
