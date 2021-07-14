@@ -1,0 +1,83 @@
+<h3>Amounts for the Current Round</h3>
+
+<table class="table">
+    <tr>
+        <th>Average Amount Sent</th>
+        <td>{{ avg_sent|to0 }}</td>
+    </tr>
+    <tr>
+        <th>Average Amount Sent Back</th>
+        <td>{{ avg_sent_back|to0 }}</td>
+    </tr>
+    <tr>
+        <th>Minimum Amount Sent</th>
+        <td>{{ min_sent }}</td>
+    </tr>
+    <tr>
+        <th>Minimum Amount Sent Back</th>
+        <td>{{ min_sent_back }}</td>
+    </tr>
+    <tr>
+        <th>Maximum Amount Sent</th>
+        <td>{{ max_sent }}</td>
+    </tr>
+    <tr>
+        <th>Maximum Amount Sent Back</th>
+        <td>{{ max_sent_back }}</td>
+    </tr>
+</table>
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+<figure class="highcharts-figure">
+    <div id="container"></div>
+</figure>
+
+<script>
+    let amount_exists = {{ amount_exists|json }};
+    let group_names = {{ group_names|json }};
+    let all_amounts = {{ all_amounts|json }};
+
+
+    if (amount_exists){
+        Highcharts.chart('container', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Amounts Sent & Sent Back for All Rounds'
+            },
+            subtitle: {
+                text: 'Trust Game'
+            },
+            xAxis: {
+                categories: group_names,
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Amounts'
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: all_amounts
+        });
+     }
+</script>
