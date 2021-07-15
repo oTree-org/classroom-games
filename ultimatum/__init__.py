@@ -2,10 +2,10 @@ from otree.api import *
 from shared_out import get_or_none
 
 doc = """
-This is a standard 2-player ultimatum game where the amount sent by player 1 gets
-tripled. The game was first proposed by
-<a href="http://econweb.ucsd.edu/~jandreon/Econ264/papers/Berg%20et%20al%20GEB%201995.pdf" target="_blank">
-    Berg, Dickhaut, and McCabe (1995)
+This is a standard 2-player Ultimatum Game where the offer by Player 1 gets
+accepted or rejected by Player 2. If the offer is rejected, both players get no payoff. The game was first proposed by
+<a href="https://journals-sagepub-com.proxyiub.uits.iu.edu/doi/pdf/10.1177/002200276100500205" target="_blank">
+    Harsanyi, John C. (1961)
 </a>.
 """
 
