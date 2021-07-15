@@ -1,4 +1,5 @@
 from otree.api import *
+from shared_out import get_or_none
 
 doc = """
 This is a standard 2-player ultimatum game where the amount sent by player 1 gets
@@ -21,6 +22,66 @@ class Constants(BaseConstants):
 
 class Subsession(BaseSubsession):
     pass
+
+
+def vars_for_admin_report(subsession: Subsession):
+    offers = [
+        g.offer for g in subsession.get_groups() if get_or_none(g, 'offer') != None
+    ]
+
+    offer_acceptance = [
+        g.offer_accepted
+        for g in subsession.get_groups()
+        if get_or_none(g, 'offer_accepted') != None
+    ]
+
+    accepted_offers = []
+    rejected_offers = []
+
+    if offers and offer_acceptance:
+        for ss in subsession.in_all_rounds():
+            groups = ss.get_groups()
+            round_accepted = []
+            round_rejected = []
+            for group in groups:
+                if group.offer_accepted:
+                    round_accepted.append(group.offer)
+                    round_rejected.append(None)
+                else:
+                    round_accepted.append(None)
+                    round_rejected.append(group.offer)
+            accepted_offers.append(
+                {'name': 'Round {}'.format(ss.round_number), 'data': round_accepted}
+            )
+            rejected_offers.append(
+                {'name': 'Round {}'.format(ss.round_number), 'data': round_rejected}
+            )
+
+        group_names = ['Group {}'.format(i) for i in range(1, len(ss.get_groups()) + 1)]
+
+        return dict(
+            offer_exists=True,
+            avg_offer=sum(offers) / len(offers),
+            max_offer=max(offers),
+            min_offer=min(offers),
+            offer_acceptance_rate='{}%'.format(
+                round((sum(offer_acceptance) / len(offer_acceptance)) * 100, 2)
+            ),
+            group_names=group_names,
+            accepted_offers=accepted_offers,
+            rejected_offers=rejected_offers,
+        )
+    else:
+        return dict(
+            offer_exists=False,
+            avg_offer='(No Data)',
+            max_offer='(No Data)',
+            min_offer='(No Data)',
+            offer_acceptance_rate='(No Data)',
+            group_names='(No Data)',
+            accepted_offers='(No Data)',
+            rejected_offers='(No Data)',
+        )
 
 
 class Group(BaseGroup):
