@@ -69,13 +69,29 @@ def vars_for_admin_report(subsession: Subsession):
 
     # nash_equilibrium=(Constants.total_capacity/3) * Constants.players_per_group
 
+    pie_chart_data = [
+        dict(
+            name="D/C",
+            y=50
+        ),
+        dict(
+            name="D/D",
+            y=25
+        ),
+        dict(
+            name="C/C",
+            y=25
+        )
+    ]
+
     if payoff_all_players:
         return dict(
             avg_payoff=sum(payoff_all_players) / len(payoff_all_players),
             min_payoff=min(payoff_all_players),
             max_payoff=max(payoff_all_players),
             group_names=group_names,
-            player_data_matched=player_data_matched
+            player_data_matched=player_data_matched,
+            pie_chart_data=pie_chart_data,
             # nash_equilibrium=nash_equilibrium
         )
     else:
@@ -84,7 +100,8 @@ def vars_for_admin_report(subsession: Subsession):
             min_payoff='(no data)',
             max_payoff='(no data)',
             group_names=group_names,
-            player_data_matched=player_data_matched
+            player_data_matched=player_data_matched,
+            pie_chart_data=pie_chart_data,
             # nash_equilibrium=nash_equilibrium
         )
 

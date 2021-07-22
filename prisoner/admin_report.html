@@ -34,7 +34,9 @@
 <script>
     let group_names = {{ group_names|json }}
     let player_data_matched = {{ player_data_matched|json }}
+    let pie_chart_data = {{ pie_chart_data|json }}
 
+    //pie chart
     document.addEventListener('DOMContentLoaded', function () {
         const chart = Highcharts.chart('pie_chart_container', {
             chart: {
@@ -72,18 +74,14 @@
             series: [{
                 name: 'Strategy',
                 colorByPoint: true,
-                data: player_data_matched
+                data: pie_chart_data
             }],
             // colors: ['#4572A7'] //use same color for all non-optimal bars inorder to show that users in a single group actually play
             // // together and may represent the same user
         });
     });
-</script>
 
-<script>
-    let group_names = {{ group_names|json }}
-    let player_data_matched = {{ player_data_matched|json }}
-
+    //column chart
     document.addEventListener('DOMContentLoaded', function () {
         const chart = Highcharts.chart('column_chart_container', {
             chart: {
