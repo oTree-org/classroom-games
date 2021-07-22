@@ -2,6 +2,7 @@
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
 <script src="https://code.highcharts.com/modules/export-data.js"></script>
 <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script src="https://code.highcharts.com/modules/coloraxis.js"></script>
 
 <figure class="highcharts-figure">
     <div id="pie_chart_container"></div>
@@ -75,9 +76,7 @@
                 name: 'Strategy',
                 colorByPoint: true,
                 data: pie_chart_data
-            }],
-            // colors: ['#4572A7'] //use same color for all non-optimal bars inorder to show that users in a single group actually play
-            // // together and may represent the same user
+            }]
         });
     });
 
@@ -117,9 +116,10 @@
                     borderWidth: 0
                 }
             },
-            series: player_data_matched,
-            colors: ['#4572A7'] //use same color for all non-optimal bars inorder to show that users in a single group actually play
-            // together and may represent the same user
+            colorAxis: {
+                stops: [[0,'#00bfff'], [1,'#ff4000']]
+            },
+            series: player_data_matched
         });
     });
 </script>

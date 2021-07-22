@@ -26,6 +26,23 @@ class Subsession(BaseSubsession):
     pass
 
 
+# returns color based on whether a player cooperated or defected
+def get_column_chart_color(payoff):
+    cooperated = "#00FF00"
+    defected = "#4572A7"
+    color = ""
+    if payoff == 0:  # todo read these (0, 100, etc..) from Constants file
+        color = cooperated
+    elif payoff == 100:
+        color = defected
+    elif payoff == 200:
+        color = cooperated
+    elif payoff == 300:
+        color = defected
+
+    return color
+
+
 def vars_for_admin_report(subsession: Subsession):
     group_names = ["Group " + str(g.id_in_subsession) for g in subsession.get_groups()]
     # todo id_in_subsession is wrong! fix later
@@ -41,10 +58,14 @@ def vars_for_admin_report(subsession: Subsession):
                 payoff = 0
             else:
                 payoff = p.payoff
+
+            print("appending.....", str(p.id_in_group))
+            print("color.....", get_column_chart_color(payoff))
             player_data.append(
                 dict(
                     name="Player " + str(p.id_in_group),
-                    data=[payoff]
+                    data=[payoff],
+                    colorValue=[get_column_chart_color(payoff)]
                 )
             )
 
@@ -55,13 +76,31 @@ def vars_for_admin_report(subsession: Subsession):
         name = player['name']
         if name in player_data_matched.keys():
             player_data_matched[name]['data'].append(player['data'][0])
+            player_data_matched[name]['colorValue'].append(player['colorValue'][0])
         else:
             player_data_matched[name] = player
 
     # convert the values to a list
     player_data_matched = list(player_data_matched.values())
 
+    # print("player_data_matched-------", player_data_matched)
+
+    player_data_matched = [
+        dict(
+            type='column',
+            colorKey='colorValue',
+            name='Player 1',
+            data= [dict(y=100, colorValue=0), dict(y=200, colorValue=0)]
+        ),
+        dict(
+            type='column',
+            colorKey='colorValue',
+            name='Player 2',
+            data= [dict(y=300, colorValue=300), dict(y=200, colorValue=0)]
+        ),
+    ]
     print("player_data_matched-------", player_data_matched)
+
     payoff_all_players = [
         p.payoff for p in subsession.get_players()
         if get_or_none(p, 'payoff') != None
@@ -71,16 +110,19 @@ def vars_for_admin_report(subsession: Subsession):
 
     pie_chart_data = [
         dict(
-            name="D/C",
-            y=50
+            name="Mix of Defection and Cooperation",
+            y=50,
+            color="#f0f0f5"
         ),
         dict(
-            name="D/D",
-            y=25
+            name="All Defected",
+            y=25,
+            color="#ff4000"
         ),
         dict(
-            name="C/C",
-            y=25
+            name="All Cooperated",
+            y=25,
+            color="#00bfff"
         )
     ]
 

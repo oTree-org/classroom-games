@@ -77,6 +77,8 @@ def vars_for_admin_report(subsession: Subsession):
         data=lowest_payoff_best_response_function
     ))
 
+    print("player_data_matched-------", player_data_matched)
+
     units_all_players = [
         p.units for p in subsession.get_players()
         if get_or_none(p, 'units') != None
