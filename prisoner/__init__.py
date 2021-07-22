@@ -44,13 +44,16 @@ def get_column_chart_color(payoff):
 
 
 def get_group_strategy(payoffs_for_this_group):
+    p = payoffs_for_this_group
     strategy = ""
-    if len(payoffs_for_this_group) == 2:  # todo tmp
+    if (p[0] == 200) & (p[1] == 200):
         strategy = "all_cooperated"
-    # elif payoffs_for_this_group == 100:
-    #     strategy = "all_defected"
-    # elif payoffs_for_this_group == 200:
-    #     strategy = "both_cooperated_and_defected"
+    elif (p[0] == 300) & (p[1] == 0):
+        strategy = "both_cooperated_and_defected"
+    elif (p[0] == 0) & (p[1] == 300):
+        strategy = "both_cooperated_and_defected"
+    elif (p[0] == 100) & (p[1] == 100):
+        strategy = "all_defected"
     return strategy
 
 
