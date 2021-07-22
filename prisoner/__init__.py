@@ -28,31 +28,30 @@ class Subsession(BaseSubsession):
 
 # returns color based on whether a player cooperated or defected
 def get_column_chart_color(payoff):
-    cooperated = 0 # indicates blue color in highcharts # todo read these (min and max) from Constants file
-    defected = 300 # indicates red color in highcharts
+    cooperated = Constants.betrayed_payoff # indicates blue color in highcharts
+    defected = Constants.betray_payoff # indicates red color in highcharts
     color = ""
-    if payoff == 0:  # todo read these (0, 100, etc..) from Constants file
+    if payoff == Constants.betrayed_payoff:
         color = cooperated
-    elif payoff == 100:
+    elif payoff == Constants.both_defect_payoff:
         color = defected
-    elif payoff == 200:
+    elif payoff == Constants.both_cooperate_payoff:
         color = cooperated
-    elif payoff == 300:
+    elif payoff == Constants.betray_payoff:
         color = defected
-
     return color
 
 
 def get_group_strategy(payoffs_for_this_group):
     p = payoffs_for_this_group
     strategy = ""
-    if (p[0] == 200) & (p[1] == 200):
+    if (p[0] == Constants.both_cooperate_payoff) & (p[1] == Constants.both_cooperate_payoff):
         strategy = "all_cooperated"
-    elif (p[0] == 300) & (p[1] == 0):
+    elif (p[0] == Constants.betray_payoff) & (p[1] == Constants.betrayed_payoff):
         strategy = "both_cooperated_and_defected"
-    elif (p[0] == 0) & (p[1] == 300):
+    elif (p[0] == Constants.betrayed_payoff) & (p[1] == Constants.betray_payoff):
         strategy = "both_cooperated_and_defected"
-    elif (p[0] == 100) & (p[1] == 100):
+    elif (p[0] == Constants.both_defect_payoff) & (p[1] == Constants.both_defect_payoff):
         strategy = "all_defected"
     return strategy
 
@@ -92,8 +91,6 @@ def vars_for_admin_report(subsession: Subsession):
 
         group_strategies.append(get_group_strategy(payoffs_for_this_group))
 
-    print("group_strategies-------", group_strategies)
-
     # match players in player data by index so that; the "first" player in each group
     # has payoff assigned for each highcharts series - design limitation by highcharts
     player_data_matched = {}
@@ -107,15 +104,12 @@ def vars_for_admin_report(subsession: Subsession):
     # convert the values to a list
     player_data_matched = list(player_data_matched.values())
 
-    # print("player_data_matched-------", player_data_matched)
     payoff_all_players = [
         p.payoff for p in subsession.get_players()
         if get_or_none(p, 'payoff') != None
     ]
 
-    # nash_equilibrium=(Constants.total_capacity/3) * Constants.players_per_group
-
-    # build piechart data - could be extracted into function!
+    # build pie chart data - could be extracted into function!
     all_cooperated_percent = group_strategies.count("all_cooperated")/3*100
     all_defected_percent = group_strategies.count("all_defected")/3*100
     both_cooperated_and_defected_percent = group_strategies.count("both_cooperated_and_defected")/3*100
@@ -138,6 +132,9 @@ def vars_for_admin_report(subsession: Subsession):
         )
     ]
 
+    nash_equilibrium_vector="(" + str(Constants.both_cooperate_payoff) + ", " + str(Constants.both_cooperate_payoff) + ")"
+    optimal_equilibrium_vector="(" + str(Constants.both_defect_payoff) + ", " + str(Constants.both_defect_payoff) + ")"
+
     if payoff_all_players:
         return dict(
             avg_payoff=sum(payoff_all_players) / len(payoff_all_players),
@@ -146,7 +143,8 @@ def vars_for_admin_report(subsession: Subsession):
             group_names=group_names,
             player_data_matched=player_data_matched,
             pie_chart_data=pie_chart_data,
-            # nash_equilibrium=nash_equilibrium
+            nash_equilibrium_vector=nash_equilibrium_vector,
+            optimal_equilibrium_vector=optimal_equilibrium_vector
         )
     else:
         return dict(
@@ -156,7 +154,8 @@ def vars_for_admin_report(subsession: Subsession):
             group_names=group_names,
             player_data_matched=player_data_matched,
             pie_chart_data=pie_chart_data,
-            # nash_equilibrium=nash_equilibrium
+            nash_equilibrium_vector=nash_equilibrium_vector,
+            optimal_equilibrium_vector=optimal_equilibrium_vector
         )
 
 

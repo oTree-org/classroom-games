@@ -7,11 +7,21 @@
 <figure class="highcharts-figure">
     <div id="pie_chart_container"></div>
     <p class="highcharts-description">
-        A pie chart.....
+        The pie chart above shows the percentage of strategies used by players by per group, i.e Both player cooperated,
+        Both defected, or both cooperate and defected
     </p>
 
     <p class="highcharts-description">
-    blaaa about pie chart.....
+        Conclusion:
+        We can see that rational beings' behaviour cannot easily be predicted in non-zero sum games.
+    </p>
+
+    <p class="highcharts-description">
+        Question 1:
+        Did communication with your group member help you when making your choice/ deciding your strategy? Was the other
+        player honest - were their actions correlated to what was decided upon in your chart?
+
+        This is known as a cooperative non zero-sum game.
     </p>
 
 </figure>
@@ -19,14 +29,20 @@
 <figure class="highcharts-figure">
     <div id="column_chart_container"></div>
     <p class="highcharts-description">
-        The blue bars indicate the units produced per group.
-        The green bar indicates the best response function for the player with the lower profit,
-        in comparison with the player with the highest profit. i.e:
+        The graph above show the different decisions made by players per group, and the pay off earned per player.
+        Red indicates defection, while blue indicates cooperation.
     </p>
 
     <p class="highcharts-description">
-        "How many units should the lowest profit firm (player) have produced inorder to maximise their profit, given the units
-        produced by the other firm?(player)"
+        Question 2:
+        If you repeated the game with another randomly assigned player, would you change your strategy?
+        Would it be different if you repeated the game with the same player you played with in the first round?
+    </p>
+
+    <p class="highcharts-description">
+        Question 3:
+        Do you think that rational humans in general are more likely to defect, or cooperate? Think of a real life situation.
+        Relate this to evolution in biology too, and see which strategy is most used by living organisms to survive.
     </p>
 
 </figure>
@@ -44,15 +60,11 @@
                 type: 'pie'
             },
             title: {
-                text: 'Distribution of choices made by players'
+                text: 'Distribution of strategies made by players per group'
             },
             subtitle: {
                 text: 'Refresh for new results if players are still playing'
             },
-            // xAxis: {
-            //     categories: group_names,
-            //     crosshair: true
-            // },
             tooltip: {
                 headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
                 pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
@@ -87,7 +99,7 @@
                 type: 'column'
             },
             title: {
-                text: 'Payoff earned per player'
+                text: 'Strategy and Payoff earned per player per group'
             },
             subtitle: {
                 text: 'Refresh for new results if players are still playing'
@@ -124,14 +136,14 @@
     });
 </script>
 
-<p><b>Nash Equilibrium</b></p>
-The Cournot experiment is ultimately used to compare the output of a monopolist in the same market conditions as used in this game.
-In this market, the monopoly optimal quantity will always be lower than the duopolist's combined output at the Nash Equilibrium: GET THIS VAR.
+<p><b>Nash Equilibrium and Optimal Equilibrium</b></p>
+    The Nash Equilibrium vector for this game is  {{ nash_equilibrium_vector }} while the Optimal (but unstable) Equilibrium
+    vector is {{ optimal_equilibrium_vector }}
 
-This proves that as Cournot concluded, "As everyone believes without any analysis, competition reduces the market price".
-
-<p>Quiz: What is the monopolist optimal output in this market?</p>
-
+<p class="highcharts-description">
+    Question 4:
+    What is the different between the Nash Equilibrium and Optimal Equilibrium?
+</p>
 
 <table class="table">
     <tr>
