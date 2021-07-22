@@ -43,14 +43,27 @@ def get_column_chart_color(payoff):
     return color
 
 
+def get_group_strategy(payoffs_for_this_group):
+    strategy = ""
+    if len(payoffs_for_this_group) == 2:  # todo tmp
+        strategy = "all_cooperated"
+    # elif payoffs_for_this_group == 100:
+    #     strategy = "all_defected"
+    # elif payoffs_for_this_group == 200:
+    #     strategy = "both_cooperated_and_defected"
+    return strategy
+
+
 def vars_for_admin_report(subsession: Subsession):
     group_names = ["Group " + str(g.id_in_subsession) for g in subsession.get_groups()]
     # todo id_in_subsession is wrong! fix later
 
     # create player data list
     player_data = []
+    group_strategies = []
     for g in subsession.get_groups():
         i = 0
+        payoffs_for_this_group = []
         for p in g.get_players():
             i = i + 1
             payoff = 0
@@ -70,6 +83,13 @@ def vars_for_admin_report(subsession: Subsession):
                     colorKey='colorValue'
                 )
             )
+
+            # updated local group payoffs list with this group's payoff inorder to calculate the group strategy
+            payoffs_for_this_group.append(payoff)
+
+        group_strategies.append(get_group_strategy(payoffs_for_this_group))
+
+    print("group_strategies-------", group_strategies)
 
     # match players in player data by index so that; the "first" player in each group
     # has payoff assigned for each highcharts series - design limitation by highcharts
@@ -92,21 +112,26 @@ def vars_for_admin_report(subsession: Subsession):
 
     # nash_equilibrium=(Constants.total_capacity/3) * Constants.players_per_group
 
+    # build piechart data - could be extracted into function!
+    all_cooperated_percent = group_strategies.count("all_cooperated")/3*100
+    all_defected_percent = group_strategies.count("all_defected")/3*100
+    both_cooperated_and_defected_percent = group_strategies.count("both_cooperated_and_defected")/3*100
+
     pie_chart_data = [
         dict(
-            name="Mix of Defection and Cooperation",
-            y=50,
-            color="#f0f0f5"
+            name="All Cooperated",
+            y=round(all_cooperated_percent),
+            color="#00bfff"
         ),
         dict(
             name="All Defected",
-            y=25,
+            y=round(all_defected_percent),
             color="#ff4000"
         ),
         dict(
-            name="All Cooperated",
-            y=25,
-            color="#00bfff"
+            name="Mix of Defection and Cooperation",
+            y=round(both_cooperated_and_defected_percent),
+            color="#800040"
         )
     ]
 
