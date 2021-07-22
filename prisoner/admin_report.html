@@ -7,8 +7,8 @@
 <figure class="highcharts-figure">
     <div id="pie_chart_container"></div>
     <p class="highcharts-description">
-        The pie chart above shows the percentage of strategies used by players by per group, i.e Both player cooperated,
-        Both defected, or both cooperate and defected
+        The pie chart above shows the percentage of strategies used by players by per group, i.e Both players Cooperated,
+        Both players Defected, or Both Cooperated and Defected.
     </p>
 
     <p class="highcharts-description">
@@ -68,7 +68,7 @@
             tooltip: {
                 headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
                 pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                    '<td style="padding:0"><b>{point.y:.1f} units</b></td></tr>',
+                    '<td style="padding:0"><b>{point.y:.1f} %</b></td></tr>',
                 footerFormat: '</table>',
                 shared: true,
                 useHTML: true
@@ -117,7 +117,7 @@
             tooltip: {
                 headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
                 pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                    '<td style="padding:0"><b>{point.y:.1f} units</b></td></tr>',
+                    '<td style="padding:0"><b>{point.y:.1f} points</b></td></tr>',
                 footerFormat: '</table>',
                 shared: true,
                 useHTML: true

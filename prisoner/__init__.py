@@ -110,23 +110,23 @@ def vars_for_admin_report(subsession: Subsession):
     ]
 
     # build pie chart data - could be extracted into function!
-    all_cooperated_percent = group_strategies.count("all_cooperated")/3*100
-    all_defected_percent = group_strategies.count("all_defected")/3*100
-    both_cooperated_and_defected_percent = group_strategies.count("both_cooperated_and_defected")/3*100
+    all_cooperated_percent = group_strategies.count("all_cooperated")/len(group_strategies)*100
+    all_defected_percent = group_strategies.count("all_defected")/len(group_strategies)*100
+    both_cooperated_and_defected_percent = group_strategies.count("both_cooperated_and_defected")/len(group_strategies)*100
 
     pie_chart_data = [
         dict(
-            name="All Cooperated",
+            name="Groups where both players cooperated",
             y=round(all_cooperated_percent),
             color="#00bfff"
         ),
         dict(
-            name="All Defected",
+            name="Groups where both players defected",
             y=round(all_defected_percent),
             color="#ff4000"
         ),
         dict(
-            name="Mix of Defection and Cooperation",
+            name="Groups where both players has a mix of defection and cooperation",
             y=round(both_cooperated_and_defected_percent),
             color="#800040"
         )
