@@ -1,5 +1,7 @@
 from otree.api import *
 
+from shared_out import get_or_none
+
 doc = """
 This is a one-shot "Prisoner's Dilemma". Two players are asked separately
 whether they want to cooperate or defect. Their choices directly determine the
@@ -22,6 +24,69 @@ class Constants(BaseConstants):
 
 class Subsession(BaseSubsession):
     pass
+
+
+def vars_for_admin_report(subsession: Subsession):
+    group_names = ["Group " + str(g.id_in_subsession) for g in subsession.get_groups()]
+    # todo id_in_subsession is wrong! fix later
+
+    # create player data list
+    player_data = []
+    for g in subsession.get_groups():
+        i = 0
+        for p in g.get_players():
+            i = i + 1
+            payoff = 0
+            if get_or_none(p, 'payoff') == None:
+                payoff = 0
+            else:
+                payoff = p.payoff
+            player_data.append(
+                dict(
+                    name="Player " + str(p.id_in_group),
+                    data=[payoff]
+                )
+            )
+
+    # match players in player data by index so that; the "first" player in each group
+    # has payoff assigned for each highcharts series - design limitation by highcharts
+    player_data_matched = {}
+    for player in player_data:
+        name = player['name']
+        if name in player_data_matched.keys():
+            player_data_matched[name]['data'].append(player['data'][0])
+        else:
+            player_data_matched[name] = player
+
+    # convert the values to a list
+    player_data_matched = list(player_data_matched.values())
+
+    print("player_data_matched-------", player_data_matched)
+    payoff_all_players = [
+        p.payoff for p in subsession.get_players()
+        if get_or_none(p, 'payoff') != None
+    ]
+
+    # nash_equilibrium=(Constants.total_capacity/3) * Constants.players_per_group
+
+    if payoff_all_players:
+        return dict(
+            avg_payoff=sum(payoff_all_players) / len(payoff_all_players),
+            min_payoff=min(payoff_all_players),
+            max_payoff=max(payoff_all_players),
+            group_names=group_names,
+            player_data_matched=player_data_matched
+            # nash_equilibrium=nash_equilibrium
+        )
+    else:
+        return dict(
+            avg_upayoff='(no data)',
+            min_payoff='(no data)',
+            max_payoff='(no data)',
+            group_names=group_names,
+            player_data_matched=player_data_matched
+            # nash_equilibrium=nash_equilibrium
+        )
 
 
 class Group(BaseGroup):

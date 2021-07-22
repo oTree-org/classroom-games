@@ -70,7 +70,7 @@ def vars_for_admin_report(subsession: Subsession):
         if get_or_none(g, 'lowest_payoff_best_response_function') != None
     ]
 
-    # add bfr units to player_data_matched list
+    # add brf units to player_data_matched list
     player_data_matched.append(dict(
         name='Best response function units for player with least payoff',
         color='#00FF00',
