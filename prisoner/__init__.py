@@ -21,6 +21,10 @@ class Constants(BaseConstants):
     both_cooperate_payoff = cu(200)
     both_defect_payoff = cu(100)
 
+    color_red_defect = "#ff4000"
+    color_blue_cooperate = "#00bfff"
+    color_maroon_mix = "#800040"
+
 
 class Subsession(BaseSubsession):
     pass
@@ -118,17 +122,17 @@ def vars_for_admin_report(subsession: Subsession):
         dict(
             name="Groups where both players cooperated",
             y=round(all_cooperated_percent),
-            color="#00bfff"
+            color=Constants.color_blue_cooperate
         ),
         dict(
             name="Groups where both players defected",
             y=round(all_defected_percent),
-            color="#ff4000"
+            color=Constants.color_red_defect
         ),
         dict(
             name="Groups where both players has a mix of defection and cooperation",
             y=round(both_cooperated_and_defected_percent),
-            color="#800040"
+            color=Constants.color_maroon_mix
         )
     ]
 

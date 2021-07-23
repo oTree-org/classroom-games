@@ -30,7 +30,11 @@
     <div id="column_chart_container"></div>
     <p class="highcharts-description">
         The graph above show the different decisions made by players per group, and the pay off earned per player.
-        Red indicates defection, while blue indicates cooperation.
+        <br>
+        <br>
+        <span style="color:#ff4000;">Red</span> indicates <b> defection</b>.
+        <br>
+        <span style="color:#00bfff;">Blue</span> indicates <b> cooperation</b>.
     </p>
 
     <p class="highcharts-description">
@@ -125,11 +129,13 @@
             plotOptions: {
                 column: {
                     pointPadding: 0.2,
-                    borderWidth: 0
+                    borderWidth: 0,
+                    minPointLength: 5 // show the 0 value on the graph!
                 }
             },
             colorAxis: {
-                stops: [[0,'#00bfff'], [1,'#ff4000']]
+                stops: [[0,'#00bfff'], [1,'#ff4000']], //todo get these from constants file
+                showInLegend: false
             },
             series: player_data_matched
         });
