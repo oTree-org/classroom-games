@@ -31,32 +31,23 @@ class Subsession(BaseSubsession):
 
 
 # returns color based on whether a player cooperated or defected
-def get_column_chart_color(payoff):
-    cooperated = Constants.betrayed_payoff  # indicates blue color in highcharts
-    defected = Constants.betray_payoff  # indicates red color in highcharts
-    color = ""
-    if payoff == Constants.betrayed_payoff:
-        color = cooperated
-    elif payoff == Constants.both_defect_payoff:
-        color = defected
-    elif payoff == Constants.both_cooperate_payoff:
-        color = cooperated
-    elif payoff == Constants.betray_payoff:
-        color = defected
-    return color
+def get_column_chart_color(cooperated):
+    cooperated_color = Constants.betrayed_payoff  # numeric value of betrayed_payoff indicates blue color in highcharts
+    defected_color = Constants.betray_payoff  # numeric value of betray_payoff indicates red color in highcharts
+    if cooperated:
+        return cooperated_color
+    else:
+        return defected_color
 
 
-def get_group_strategy(payoffs_for_this_group):
-    p = payoffs_for_this_group
+def get_group_strategy(sum_of_cooperations_in_group):
     strategy = ""
-    if (p[0] == Constants.both_cooperate_payoff) & (p[1] == Constants.both_cooperate_payoff):
-        strategy = "all_cooperated"
-    elif (p[0] == Constants.betray_payoff) & (p[1] == Constants.betrayed_payoff):
-        strategy = "both_cooperated_and_defected"
-    elif (p[0] == Constants.betrayed_payoff) & (p[1] == Constants.betray_payoff):
-        strategy = "both_cooperated_and_defected"
-    elif (p[0] == Constants.both_defect_payoff) & (p[1] == Constants.both_defect_payoff):
+    if sum_of_cooperations_in_group == 0:
         strategy = "all_defected"
+    elif sum_of_cooperations_in_group == 1:
+        strategy = "both_cooperated_and_defected"
+    elif sum_of_cooperations_in_group == 2:
+        strategy = "all_cooperated"
     return strategy
 
 
@@ -67,14 +58,14 @@ def vars_for_admin_report(subsession: Subsession):
     player_data = []
     group_strategies = []
     for g in subsession.get_groups():
-        payoffs_for_this_group = []
+        cooperated_decision_for_group = []
         for p in g.get_players():
             player_data.append(
                 dict(
                     name="Player " + str(p.id_in_group),
                     data=[dict(
                         y=p.payoff,
-                        colorValue=get_column_chart_color(p.payoff)
+                        colorValue=get_column_chart_color(p.cooperated)
                     )],
                     type='column',
                     colorKey='colorValue'
@@ -82,9 +73,9 @@ def vars_for_admin_report(subsession: Subsession):
             )
 
             # updated local group payoffs list with this group's payoff inorder to calculate the group strategy
-            payoffs_for_this_group.append(p.payoff)
+            cooperated_decision_for_group.append(p.cooperated)
 
-        group_strategies.append(get_group_strategy(payoffs_for_this_group))
+        group_strategies.append(get_group_strategy(sum(cooperated_decision_for_group)))
 
     # match players in player data by index so that; the "first" player in each group
     # has payoff assigned for each highcharts series - design limitation by highcharts
@@ -174,6 +165,7 @@ def other_player(player: Player):
 
 
 def set_payoff(player: Player):
+    # true represents "cooperated", false represents "defected"
     payoff_matrix = dict(
         true=dict(
             true=Constants.both_cooperate_payoff, false=Constants.betrayed_payoff
@@ -183,14 +175,11 @@ def set_payoff(player: Player):
         ),
     )
 
-    print("payoff_matrix", payoff_matrix)
-    print("player.cooperated", player.cooperated)
-    print("other_player(player).cooperated]", other_player(player).cooperated)
     player.payoff = payoff_matrix[str(player.cooperated).lower()][str(other_player(player).cooperated).lower()]
 
 
-def get_decision(cooperated_boolean):
-    if cooperated_boolean:
+def get_decision(cooperated):
+    if cooperated:
         return "Cooperate"
     else:
         return "Defect"
