@@ -128,7 +128,8 @@ def vars_for_admin_report(subsession: Subsession):
         )
     ]
 
-    nash_equilibrium_vector = "( {x}, {y} )".format(x=Constants.both_cooperate_payoff, y=Constants.both_cooperate_payoff)
+    nash_equilibrium_vector = "( {x}, {y} )".format(x=Constants.both_cooperate_payoff,
+                                                    y=Constants.both_cooperate_payoff)
     optimal_equilibrium_vector = "( {x}, {y} )".format(x=Constants.both_defect_payoff, y=Constants.both_defect_payoff)
 
     context = dict(
@@ -159,11 +160,7 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
-    decision = models.StringField(
-        choices=[['Cooperate', 'Cooperate'], ['Defect', 'Defect']],
-        doc="""This player's decision""",
-        widget=widgets.RadioSelect,
-    )
+    cooperated = models.BooleanField()
 
 
 # FUNCTIONS
@@ -178,14 +175,25 @@ def other_player(player: Player):
 
 def set_payoff(player: Player):
     payoff_matrix = dict(
-        Cooperate=dict(
-            Cooperate=Constants.both_cooperate_payoff, Defect=Constants.betrayed_payoff
+        true=dict(
+            true=Constants.both_cooperate_payoff, false=Constants.betrayed_payoff
         ),
-        Defect=dict(
-            Cooperate=Constants.betray_payoff, Defect=Constants.both_defect_payoff
+        false=dict(
+            true=Constants.betray_payoff, false=Constants.both_defect_payoff
         ),
     )
-    player.payoff = payoff_matrix[player.decision][other_player(player).decision]
+
+    print("payoff_matrix", payoff_matrix)
+    print("player.cooperated", player.cooperated)
+    print("other_player(player).cooperated]", other_player(player).cooperated)
+    player.payoff = payoff_matrix[str(player.cooperated).lower()][str(other_player(player).cooperated).lower()]
+
+
+def get_decision(cooperated_boolean):
+    if cooperated_boolean:
+        return "Cooperate"
+    else:
+        return "Defect"
 
 
 # PAGES
@@ -195,7 +203,7 @@ class Introduction(Page):
 
 class Decision(Page):
     form_model = 'player'
-    form_fields = ['decision']
+    form_fields = ['cooperated']
 
 
 class ResultsWaitPage(WaitPage):
@@ -208,9 +216,9 @@ class Results(Page):
         me = player
         opponent = other_player(me)
         return dict(
-            my_decision=me.decision,
-            opponent_decision=opponent.decision,
-            same_choice=me.decision == opponent.decision,
+            my_decision=get_decision(me.cooperated),
+            opponent_decision=get_decision(opponent.cooperated),
+            same_choice=me.cooperated == opponent.cooperated,
         )
 
 
