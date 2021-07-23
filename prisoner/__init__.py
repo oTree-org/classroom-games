@@ -1,5 +1,7 @@
 from otree.api import *
 
+from .admin_report import vars_for_admin_report_prisoner
+
 doc = """
 This is a one-shot "Prisoner's Dilemma". Two players are asked separately
 whether they want to cooperate or defect. Their choices directly determine the
@@ -19,9 +21,17 @@ class Constants(BaseConstants):
     both_cooperate_payoff = cu(200)
     both_defect_payoff = cu(100)
 
+    color_red_defect = "#ff4000"
+    color_blue_cooperate = "#00bfff"
+    color_maroon_mix = "#800040"
+
 
 class Subsession(BaseSubsession):
     pass
+
+
+def vars_for_admin_report(subsession: Subsession):
+    return vars_for_admin_report_prisoner(subsession, Constants)
 
 
 class Group(BaseGroup):
@@ -29,11 +39,7 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
-    decision = models.StringField(
-        choices=[['Cooperate', 'Cooperate'], ['Defect', 'Defect']],
-        doc="""This player's decision""",
-        widget=widgets.RadioSelect,
-    )
+    cooperated = models.BooleanField()
 
 
 # FUNCTIONS
@@ -47,15 +53,24 @@ def other_player(player: Player):
 
 
 def set_payoff(player: Player):
+    # true represents "cooperated", false represents "defected"
     payoff_matrix = dict(
-        Cooperate=dict(
-            Cooperate=Constants.both_cooperate_payoff, Defect=Constants.betrayed_payoff
+        true=dict(
+            true=Constants.both_cooperate_payoff, false=Constants.betrayed_payoff
         ),
-        Defect=dict(
-            Cooperate=Constants.betray_payoff, Defect=Constants.both_defect_payoff
+        false=dict(
+            true=Constants.betray_payoff, false=Constants.both_defect_payoff
         ),
     )
-    player.payoff = payoff_matrix[player.decision][other_player(player).decision]
+
+    player.payoff = payoff_matrix[str(player.cooperated).lower()][str(other_player(player).cooperated).lower()]
+
+
+def get_decision(cooperated):
+    if cooperated:
+        return "Cooperate"
+    else:
+        return "Defect"
 
 
 # PAGES
@@ -65,7 +80,7 @@ class Introduction(Page):
 
 class Decision(Page):
     form_model = 'player'
-    form_fields = ['decision']
+    form_fields = ['cooperated']
 
 
 class ResultsWaitPage(WaitPage):
@@ -78,9 +93,9 @@ class Results(Page):
         me = player
         opponent = other_player(me)
         return dict(
-            my_decision=me.decision,
-            opponent_decision=opponent.decision,
-            same_choice=me.decision == opponent.decision,
+            my_decision=get_decision(me.cooperated),
+            opponent_decision=get_decision(opponent.cooperated),
+            same_choice=me.cooperated == opponent.cooperated,
         )
 
 

@@ -1,0 +1,167 @@
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script src="https://code.highcharts.com/modules/coloraxis.js"></script>
+
+<figure class="highcharts-figure">
+    <div id="pie_chart_container"></div>
+    <p class="highcharts-description">
+        The pie chart above shows the percentage of strategies used by players by per group, i.e Both players Cooperated,
+        Both players Defected, or Both Cooperated and Defected.
+    </p>
+
+    <p class="highcharts-description">
+        Conclusion:
+        We can see that rational beings' behaviour cannot easily be predicted in non-zero sum games.
+    </p>
+
+    <p class="highcharts-description">
+        Question 1:
+        Did communication with your group member help you when making your choice/ deciding your strategy? Was the other
+        player honest - were their actions correlated to what was decided upon in your chart?
+
+        This is known as a cooperative non zero-sum game.
+    </p>
+
+</figure>
+
+<figure class="highcharts-figure">
+    <div id="column_chart_container"></div>
+    <p class="highcharts-description">
+        The graph above show the different decisions made by players per group, and the pay off earned per player.
+        <br>
+        <br>
+        <span style="color:#ff4000;">Red</span> indicates <b> defection</b>.
+        <br>
+        <span style="color:#00bfff;">Blue</span> indicates <b> cooperation</b>.
+    </p>
+
+    <p class="highcharts-description">
+        Question 2:
+        If you repeated the game with another randomly assigned player, would you change your strategy?
+        Would it be different if you repeated the game with the same player you played with in the first round?
+    </p>
+
+    <p class="highcharts-description">
+        Question 3:
+        Do you think that rational humans in general are more likely to defect, or cooperate? Think of a real life situation.
+        Relate this to evolution in biology too, and see which strategy is most used by living organisms to survive.
+    </p>
+
+</figure>
+
+
+<script>
+    let group_names = {{ group_names|json }}
+    let player_data_matched = {{ player_data_matched|json }}
+    let pie_chart_data = {{ pie_chart_data|json }}
+
+    //pie chart
+    document.addEventListener('DOMContentLoaded', function () {
+        const chart = Highcharts.chart('pie_chart_container', {
+            chart: {
+                type: 'pie'
+            },
+            title: {
+                text: 'Distribution of strategies made by players per group'
+            },
+            subtitle: {
+                text: 'Refresh for new results if players are still playing'
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.1f} %</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            accessibility: {
+                point: {
+                    valueSuffix: '%'
+                }
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: [{
+                name: 'Strategy',
+                colorByPoint: true,
+                data: pie_chart_data
+            }]
+        });
+    });
+
+    //column chart
+    document.addEventListener('DOMContentLoaded', function () {
+        const chart = Highcharts.chart('column_chart_container', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Strategy and Payoff earned per player per group'
+            },
+            subtitle: {
+                text: 'Refresh for new results if players are still playing'
+            },
+            xAxis: {
+                categories: group_names,
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Payoff earned'
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.1f} points</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0,
+                    minPointLength: 5 // show the 0 value on the graph!
+                }
+            },
+            colorAxis: {
+                stops: [[0,'#00bfff'], [1,'#ff4000']], //todo get these from constants file
+                showInLegend: false
+            },
+            series: player_data_matched
+        });
+    });
+</script>
+
+<p><b>Nash Equilibrium and Optimal Equilibrium</b></p>
+    The Nash Equilibrium vector for this game is  {{ nash_equilibrium_vector }} while the Optimal (but unstable) Equilibrium
+    vector is {{ optimal_equilibrium_vector }}
+
+<p class="highcharts-description">
+    Question 4:
+    What is the different between the Nash Equilibrium and Optimal Equilibrium?
+</p>
+
+<table class="table">
+    <tr>
+        <th>Average payoff earned</th>
+        <td>{{ avg_payoff }}</td>
+    </tr>
+    <tr>
+        <th>Min payoff earned</th>
+        <td>{{ min_payoff }}</td>
+    </tr>
+    <tr>
+        <th>Max payoff earned</th>
+        <td>{{ max_payoff }}</td>
+    </tr>
+</table>

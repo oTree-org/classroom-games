@@ -25,7 +25,6 @@ class Subsession(BaseSubsession):
 
 def vars_for_admin_report(subsession: Subsession):
     group_names = ["Group " + str(g.id_in_subsession) for g in subsession.get_groups()]
-    # todo id_in_subsession is wrong! fix later
 
     # create player data list
     player_data = []
@@ -70,7 +69,7 @@ def vars_for_admin_report(subsession: Subsession):
         if get_or_none(g, 'lowest_payoff_best_response_function') != None
     ]
 
-    # add bfr units to player_data_matched list
+    # add brf units to player_data_matched list
     player_data_matched.append(dict(
         name='Best response function units for player with least payoff',
         color='#00FF00',
@@ -84,24 +83,25 @@ def vars_for_admin_report(subsession: Subsession):
 
     nash_equilibrium=(Constants.total_capacity/3) * Constants.players_per_group
 
+    context = dict(
+        group_names=group_names,
+        player_data_matched=player_data_matched,
+        nash_equilibrium=nash_equilibrium
+    )
     if units_all_players:
-        return dict(
+        context.update(
             avg_units=sum(units_all_players) / len(units_all_players),
             min_units=min(units_all_players),
-            max_units=max(units_all_players),
-            group_names=group_names,
-            player_data_matched=player_data_matched,
-            nash_equilibrium=nash_equilibrium
+            max_units=max(units_all_players)
         )
+        return context
     else:
-        return dict(
+        context.update(
             avg_units='(no data)',
             min_units='(no data)',
-            max_units='(no data)',
-            group_names=group_names,
-            player_data_matched=player_data_matched,
-            nash_equilibrium=nash_equilibrium
+            max_units='(no data)'
         )
+        return context
 
 
 class Group(BaseGroup):
