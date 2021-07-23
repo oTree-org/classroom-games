@@ -21,10 +21,6 @@ class Constants(BaseConstants):
     both_cooperate_payoff = cu(200)
     both_defect_payoff = cu(100)
 
-    color_red_defect = "#ff4000"
-    color_blue_cooperate = "#00bfff"
-    color_maroon_mix = "#800040"
-
 
 class Subsession(BaseSubsession):
     pass
@@ -53,17 +49,16 @@ def other_player(player: Player):
 
 
 def set_payoff(player: Player):
-    # true represents "cooperated", false represents "defected"
-    payoff_matrix = dict(
-        true=dict(
-            true=Constants.both_cooperate_payoff, false=Constants.betrayed_payoff
-        ),
-        false=dict(
-            true=Constants.betray_payoff, false=Constants.both_defect_payoff
-        ),
-    )
 
-    player.payoff = payoff_matrix[str(player.cooperated).lower()][str(other_player(player).cooperated).lower()]
+    matrix = {
+        (True, True): Constants.both_cooperate_payoff,
+        (True, False): Constants.betrayed_payoff,
+        (False, True): Constants.betray_payoff,
+        (False, False): Constants.both_defect_payoff,
+    }
+
+    outcome = (player.cooperated, other_player(player).cooperated)
+    player.payoff = matrix[outcome]
 
 
 def get_decision(cooperated):
