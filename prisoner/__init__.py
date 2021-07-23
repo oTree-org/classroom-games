@@ -32,8 +32,8 @@ class Subsession(BaseSubsession):
 
 # returns color based on whether a player cooperated or defected
 def get_column_chart_color(payoff):
-    cooperated = Constants.betrayed_payoff # indicates blue color in highcharts
-    defected = Constants.betray_payoff # indicates red color in highcharts
+    cooperated = Constants.betrayed_payoff  # indicates blue color in highcharts
+    defected = Constants.betray_payoff  # indicates red color in highcharts
     color = ""
     if payoff == Constants.betrayed_payoff:
         color = cooperated
@@ -62,28 +62,19 @@ def get_group_strategy(payoffs_for_this_group):
 
 def vars_for_admin_report(subsession: Subsession):
     group_names = ["Group " + str(g.id_in_subsession) for g in subsession.get_groups()]
-    # todo id_in_subsession is wrong! fix later
 
     # create player data list
     player_data = []
     group_strategies = []
     for g in subsession.get_groups():
-        i = 0
         payoffs_for_this_group = []
         for p in g.get_players():
-            i = i + 1
-            payoff = 0
-            if get_or_none(p, 'payoff') == None:
-                payoff = 0
-            else:
-                payoff = p.payoff
-
             player_data.append(
                 dict(
                     name="Player " + str(p.id_in_group),
                     data=[dict(
-                        y=payoff,
-                        colorValue=get_column_chart_color(payoff)
+                        y=p.payoff,
+                        colorValue=get_column_chart_color(p.payoff)
                     )],
                     type='column',
                     colorKey='colorValue'
@@ -91,7 +82,7 @@ def vars_for_admin_report(subsession: Subsession):
             )
 
             # updated local group payoffs list with this group's payoff inorder to calculate the group strategy
-            payoffs_for_this_group.append(payoff)
+            payoffs_for_this_group.append(p.payoff)
 
         group_strategies.append(get_group_strategy(payoffs_for_this_group))
 
@@ -114,9 +105,10 @@ def vars_for_admin_report(subsession: Subsession):
     ]
 
     # build pie chart data - could be extracted into function!
-    all_cooperated_percent = group_strategies.count("all_cooperated")/len(group_strategies)*100
-    all_defected_percent = group_strategies.count("all_defected")/len(group_strategies)*100
-    both_cooperated_and_defected_percent = group_strategies.count("both_cooperated_and_defected")/len(group_strategies)*100
+    all_cooperated_percent = group_strategies.count("all_cooperated") / len(group_strategies) * 100
+    all_defected_percent = group_strategies.count("all_defected") / len(group_strategies) * 100
+    both_cooperated_and_defected_percent = group_strategies.count("both_cooperated_and_defected") / len(
+        group_strategies) * 100
 
     pie_chart_data = [
         dict(
@@ -136,31 +128,30 @@ def vars_for_admin_report(subsession: Subsession):
         )
     ]
 
-    nash_equilibrium_vector="(" + str(Constants.both_cooperate_payoff) + ", " + str(Constants.both_cooperate_payoff) + ")"
-    optimal_equilibrium_vector="(" + str(Constants.both_defect_payoff) + ", " + str(Constants.both_defect_payoff) + ")"
+    nash_equilibrium_vector = "( {x}, {y} )".format(x=Constants.both_cooperate_payoff, y=Constants.both_cooperate_payoff)
+    optimal_equilibrium_vector = "( {x}, {y} )".format(x=Constants.both_defect_payoff, y=Constants.both_defect_payoff)
 
+    context = dict(
+        group_names=group_names,
+        player_data_matched=player_data_matched,
+        pie_chart_data=pie_chart_data,
+        nash_equilibrium_vector=nash_equilibrium_vector,
+        optimal_equilibrium_vector=optimal_equilibrium_vector
+    )
     if payoff_all_players:
-        return dict(
+        context.update(
             avg_payoff=sum(payoff_all_players) / len(payoff_all_players),
             min_payoff=min(payoff_all_players),
-            max_payoff=max(payoff_all_players),
-            group_names=group_names,
-            player_data_matched=player_data_matched,
-            pie_chart_data=pie_chart_data,
-            nash_equilibrium_vector=nash_equilibrium_vector,
-            optimal_equilibrium_vector=optimal_equilibrium_vector
+            max_payoff=max(payoff_all_players)
         )
+        return context
     else:
-        return dict(
+        context.update(
             avg_upayoff='(no data)',
             min_payoff='(no data)',
-            max_payoff='(no data)',
-            group_names=group_names,
-            player_data_matched=player_data_matched,
-            pie_chart_data=pie_chart_data,
-            nash_equilibrium_vector=nash_equilibrium_vector,
-            optimal_equilibrium_vector=optimal_equilibrium_vector
+            max_payoff='(no data)'
         )
+        return context
 
 
 class Group(BaseGroup):
