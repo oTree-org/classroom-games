@@ -18,11 +18,13 @@ def vars_for_admin_report_prisoner(subsession, constants):
         if any(get_or_none(p, 'cooperated') is None for p in players):
             continue
         for p in players:
-            color = {True: COLOR_BLUE_COOPERATE, False: COLOR_RED_DEFECT}[p.cooperated]
+            # color is a numeric value sent to highcharts colorAxis. The lower value (0) is set to blue, while the
+            # higher value (300) will result in red
+            color = {True: constants.betrayed_payoff, False: constants.betray_payoff}[p.cooperated]
             player_data.append(
                 dict(
                     name="Player {}".format(p.id_in_group),
-                    data=[dict(y=p.payoff, colorValue=color,)],
+                    data=[dict(y=p.payoff, colorValue=color)],
                     type='column',
                     colorKey='colorValue',
                 )
@@ -86,6 +88,6 @@ def vars_for_admin_report_prisoner(subsession, constants):
         return context
     else:
         context.update(
-            avg_upayoff='(no data)', min_payoff='(no data)', max_payoff='(no data)'
+            avg_payoff='(no data)', min_payoff='(no data)', max_payoff='(no data)'
         )
         return context
