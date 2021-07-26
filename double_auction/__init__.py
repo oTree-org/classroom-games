@@ -43,26 +43,44 @@ def creating_session(subsession: Subsession):
 
 
 def vars_for_admin_report(subsession: Subsession):
-    players = subsession.get_players()
-    group = players[0].group
+    break_even_dict = {}
+    transaction_data = {}
+    i = 0
 
-    break_evens = {
-        player.id_in_group: player.participant.transaction_history for player in players
-    }
+    for group in subsession.get_groups():
+        i += 1
+        players = group.get_players()
+        # fetching the history of break even points for each player in group i
+        # abbreviations Used: BE - Break Even Points, G - Group Number, P - Player ID in Group
+        break_evens_group = {
+            'BE: G{}-P{}'.format(
+                i, player.id_in_group
+            ): player.participant.transaction_history
+            for player in players
+        }
+        # updating the dictionary used for visualisation with break even histories for all players in group i
+        break_even_dict.update(break_evens_group)
+
+        # now collecting all transactions data for the group
+        for tx in Transaction.filter(group=group):
+            key = 'Transactions: G{}'.format(i)
+            if key not in transaction_data:
+                transaction_data[key] = []
+            transaction_data[key].append([tx.seconds, tx.price])
+
     highcharts_series = []
 
-    for key in break_evens.keys():
+    # adding the changing break-even points to highcharts visualisations as lines
+    # and the actual transactions as scatter plots
+    for key in break_even_dict.keys():
         highcharts_series.append(
-            {'name': 'Player {}'.format(key), 'data': break_evens[key], 'type': 'line'}
+            {'name': key, 'data': break_even_dict[key], 'type': 'line'}
         )
 
-    highcharts_series.append(
-        {
-            'name': 'Transactions',
-            'data': [[tx.seconds, tx.price] for tx in Transaction.filter(group=group)],
-            'type': 'scatter',
-        }
-    )
+    for key in transaction_data.keys():
+        highcharts_series.append(
+            {'name': key, 'data': transaction_data[key], 'type': 'scatter',}
+        )
 
     return dict(highcharts_series=highcharts_series)
 

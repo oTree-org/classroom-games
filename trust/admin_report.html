@@ -1,21 +1,29 @@
-<h3>Guesses for the Current Round</h3>
+<h3>Amounts for the Current Round</h3>
 
 <table class="table">
     <tr>
-        <th>Average Guess</th>
-        <td>{{ avg_guess|to0 }}</td>
+        <th>Average Amount Sent</th>
+        <td>{{ avg_sent|to0 }}</td>
     </tr>
     <tr>
-        <th>Two - Thirds of the Average Guess</th>
-        <td>{{ two_thirds_avg_guess|to0 }}</td>
+        <th>Average Amount Sent Back</th>
+        <td>{{ avg_sent_back|to0 }}</td>
     </tr>
     <tr>
-        <th>Minimum Guess</th>
-        <td>{{ min_guess }}</td>
+        <th>Minimum Amount Sent</th>
+        <td>{{ min_sent }}</td>
     </tr>
     <tr>
-        <th>Maximum Guess</th>
-        <td>{{ max_guess }}</td>
+        <th>Minimum Amount Sent Back</th>
+        <td>{{ min_sent_back }}</td>
+    </tr>
+    <tr>
+        <th>Maximum Amount Sent</th>
+        <td>{{ max_sent }}</td>
+    </tr>
+    <tr>
+        <th>Maximum Amount Sent Back</th>
+        <td>{{ max_sent_back }}</td>
     </tr>
 </table>
 
@@ -29,30 +37,30 @@
 </figure>
 
 <script>
-    let all_guesses = {{ all_guesses|json }};
-    let guess_exists = {{ guess_exists|json }};
-    let players = {{ players|json }}
+    let amount_exists = {{ amount_exists|json }};
+    let group_names = {{ group_names|json }};
+    let all_amounts = {{ all_amounts|json }};
 
-    if (guess_exists) {
 
+    if (amount_exists){
         Highcharts.chart('container', {
             chart: {
                 type: 'column'
             },
             title: {
-                text: 'Guesses for All Rounds'
+                text: 'Amounts Sent & Sent Back for All Rounds'
             },
             subtitle: {
-                text: 'Keynesian Beauty Contest'
+                text: 'Trust Game'
             },
             xAxis: {
-                categories: players,
+                categories: group_names,
                 crosshair: true
             },
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'Guesses'
+                    text: 'Amounts'
                 }
             },
             tooltip: {
@@ -69,7 +77,7 @@
                     borderWidth: 0
                 }
             },
-            series: all_guesses
+            series: all_amounts
         });
-    }
+     }
 </script>

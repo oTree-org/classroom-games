@@ -33,6 +33,9 @@ def vars_for_admin_report(subsession: Subsession):
         p.guess for p in subsession.get_players() if get_or_none(p, 'guess') != None
     ]
 
+    # all_guesses is a list of dictionaries (this is the data format used
+    # to create highcharts series). Each item in all_guess contains two entries
+    # one for the Round Number, the other for guesses for that round.
     all_guesses = []
     for ss in subsession.in_all_rounds():
         round_guesses = [
@@ -42,6 +45,15 @@ def vars_for_admin_report(subsession: Subsession):
             {'name': 'Round {}'.format(ss.round_number), 'data': round_guesses}
         )
 
+    # Graphs are displayed only if guesses exist for the current round.
+    # players is a list containing labels for the x-axis of the charts
+    # (Group and Player IDs).
+    players = []
+    if guesses:
+        for i in range(1, len(ss.get_groups()) + 1):
+            for j in range(1, len(ss.get_group_matrix()[0]) + 1):
+                players.append('Group {} Player {}'.format(i, j))
+
     if guesses:
         return dict(
             guess_exists=True,
@@ -50,9 +62,7 @@ def vars_for_admin_report(subsession: Subsession):
             min_guess=min(guesses),
             max_guess=max(guesses),
             all_guesses=all_guesses,
-            players=[
-                'Player {}'.format(i) for i in range(1, Constants.players_per_group + 1)
-            ],
+            players=players,
         )
     else:
         return dict(
