@@ -1,0 +1,49 @@
+{{ block title }}Results{{ endblock }}
+{{ block content }}
+
+    {{ if group.offer_accepted }}
+        {{ if player.id_in_group == 1}}
+            <p>
+                You chose to offer participant B {{ group.offer }}.
+                Participant B <b>accepted</b> the offer.
+            </p>
+            <p>
+                You were initially endowed with {{ Constants.endowment }},
+                chose to send {{ group.offer }} - which was accepted.
+                Thus, you now have:
+                {{ Constants.endowment }}-{{ group.offer }}=<b>{{ player.payoff }}</b>
+            </p>
+        {{ else }}
+            <p>
+                You chose to accept Participant A's offer of {{ group.offer }}
+            </p>
+            <p>
+                Thus, you now have: <b>{{ player.payoff }}</b>
+            </p>
+            .
+        {{ endif }}
+    {{ else }}
+        {{ if player.id_in_group == 1}}
+            <p>
+                You chose to offer Participant B {{ group.offer }}.
+                Participant B <b>rejected</b> the offer.
+            </p>
+            <p>
+                You were initially endowed with {{ Constants.endowment }},
+                chose to send {{ group.offer }} - which was rejected.
+                Thus, you now have: <b>{{ player.payoff }}</b>
+            </p>
+        {{ else }}
+            <p>
+                You chose to <b>reject</b> Participant A's offer of {{ group.offer }}
+            </p>
+            <p>
+                Thus you now have: <b>{{ player.payoff }}</b>
+            </p>
+            .
+        {{ endif }}
+    {{ endif }}
+
+    {{ include Constants.instructions_template }}
+
+{{ endblock }}
