@@ -17,6 +17,7 @@ class Constants(BaseConstants):
     instructions_template = 'ultimatum/instructions.html'
     # Initial amount allocated to each player
     endowment = cu(100)
+    # Payoff to both players in case offer is rejected, generally taken to be zero
     reject_payoff = cu(0)
 
 
@@ -35,6 +36,9 @@ def vars_for_admin_report(subsession: Subsession):
         if get_or_none(g, 'offer_accepted') != None
     ]
 
+    # creating two separate visualisations for accepted and rejected offers
+    # with groups and rounds depicted on the X-axis and the size of the offers
+    # y-axis
     accepted_offers = []
     rejected_offers = []
 
