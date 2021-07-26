@@ -43,33 +43,38 @@ def creating_session(subsession: Subsession):
 
 
 def vars_for_admin_report(subsession: Subsession):
-    groups = subsession.get_groups()
-
-    break_evens = {}
+    break_even_dict = {}
     transaction_data = {}
-    group_counter = 0
+    i = 0
 
-    for group in groups:
-        group_counter += 1
+    for group in subsession.get_groups():
+        i += 1
         players = group.get_players()
+        # fetching the history of break even points for each player in group i
+        # abbreviations Used: BE - Break Even Points, G - Group Number, P - Player ID in Group
         break_evens_group = {
             'BE: G{}-P{}'.format(
-                group_counter, player.id_in_group
+                i, player.id_in_group
             ): player.participant.transaction_history
             for player in players
         }
-        break_evens.update(break_evens_group)
+        # updating the dictionary used for visualisation with break even histories for all players in group i
+        break_even_dict.update(break_evens_group)
+
+        # now collecting all transactions data for the group
         for tx in Transaction.filter(group=group):
-            key = 'Transactions: G{}'.format(group_counter)
+            key = 'Transactions: G{}'.format(i)
             if key not in transaction_data:
                 transaction_data[key] = []
             transaction_data[key].append([tx.seconds, tx.price])
 
     highcharts_series = []
 
-    for key in break_evens.keys():
+    # adding the changing break-even points to highcharts visualisations as lines
+    # and the actual transactions as scatter plots
+    for key in break_even_dict.keys():
         highcharts_series.append(
-            {'name': key, 'data': break_evens[key], 'type': 'line'}
+            {'name': key, 'data': break_even_dict[key], 'type': 'line'}
         )
 
     for key in transaction_data.keys():
